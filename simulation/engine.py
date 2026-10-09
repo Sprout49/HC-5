@@ -1,3 +1,4 @@
+import os
 import re
 """
 Core Shared Simulation World Engine for HC-05.
@@ -74,80 +75,89 @@ class SimulationEngine:
                 self.hospitals[i]["coordinates"] = feat["geometry"]["coordinates"]
 
         # Initial Ambulances fleet with realistic Pune staging coordinates
-        self.ambulances = [
-            {
-                "ambulance_id": "AMB-01",
-                "callsign": "Ambulance 01",
-                "type": "ALS",  # Advanced Life Support
-                "status": "AVAILABLE",  # AVAILABLE, CALL_RECEIVED, ACCEPTED, EN_ROUTE_TO_PATIENT, AT_PATIENT, PATIENT_PICKED_UP, EN_ROUTE_TO_HOSPITAL, AT_HOSPITAL
-                "assigned_zone": "Z1",
-                "current_location": [73.8512, 18.5312],  # Sancheti / Shivajinagar
-                "target_location": None,
-                "current_incident_id": None,
-                "active_route": None,
-                "previous_route": None,  # for visual rerouting transition
-                "route_progress": 0.0,
-                "speed_multiplier": 1.0,
-                "speed_kmh": 45.0,
-                "eta_minutes": 0.0,
-                "patients_onboard": 0,
-                "patient_capacity": 2
-            },
-            {
-                "ambulance_id": "AMB-02",
-                "callsign": "Ambulance 02",
-                "type": "BLS",
+        # Persistent Fleet Registry (Preserves Admin additions across simulation resets)
+        fleet_registry_path = "data/processed/fleet_registry.json"
+        persistent_fleet = None
+        if os.path.exists(fleet_registry_path):
+            try:
+                with open(fleet_registry_path, "r", encoding="utf-8") as f:
+                    persistent_fleet = json.load(f)
+            except Exception as e:
+                print(f"Error loading fleet registry: {e}")
+
+        if not persistent_fleet:
+            persistent_fleet = [
+                {
+                    "ambulance_id": "AMB-01",
+                    "callsign": "Ambulance 01",
+                    "type": "ALS",
+                    "assigned_zone": "Z1",
+                    "base_location": [73.8512, 18.5312],
+                    "speed_kmh": 45.0,
+                    "patient_capacity": 2,
+                    "password": "demo123"
+                },
+                {
+                    "ambulance_id": "AMB-02",
+                    "callsign": "Ambulance 02",
+                    "type": "BLS",
+                    "assigned_zone": "Z4",
+                    "base_location": [73.8390, 18.5170],
+                    "speed_kmh": 45.0,
+                    "patient_capacity": 2,
+                    "password": "demo123"
+                },
+                {
+                    "ambulance_id": "AMB-03",
+                    "callsign": "Ambulance 03",
+                    "type": "ALS",
+                    "assigned_zone": "Z5",
+                    "base_location": [73.8570, 18.5010],
+                    "speed_kmh": 45.0,
+                    "patient_capacity": 2,
+                    "password": "demo123"
+                },
+                {
+                    "ambulance_id": "AMB-04",
+                    "callsign": "Ambulance 04",
+                    "type": "ALS",
+                    "assigned_zone": "Z3",
+                    "base_location": [73.8744, 18.5284],
+                    "speed_kmh": 45.0,
+                    "patient_capacity": 2,
+                    "password": "demo123"
+                }
+            ]
+
+        self.ambulances = []
+        for item in persistent_fleet:
+            b_loc = item.get("base_location") or item.get("current_location", [73.8512, 18.5312])
+            self.ambulances.append({
+                "ambulance_id": item["ambulance_id"],
+                "callsign": item.get("callsign", item["ambulance_id"]),
+                "type": item.get("type", "ALS"),
                 "status": "AVAILABLE",
-                "assigned_zone": "Z4",
-                "current_location": [73.8390, 18.5170],  # Deccan Gymkhana
+                "assigned_zone": item.get("assigned_zone", "Z1"),
+                "base_location": list(b_loc),
+                "current_location": list(b_loc),
                 "target_location": None,
                 "current_incident_id": None,
                 "active_route": None,
                 "previous_route": None,
                 "route_progress": 0.0,
                 "speed_multiplier": 1.0,
-                "speed_kmh": 45.0,
+                "speed_kmh": float(item.get("speed_kmh", 45.0)),
                 "eta_minutes": 0.0,
                 "patients_onboard": 0,
-                "patient_capacity": 2
-            },
-            {
-                "ambulance_id": "AMB-03",
-                "callsign": "Ambulance 03",
-                "type": "ALS",
-                "status": "AVAILABLE",
-                "assigned_zone": "Z5",
-                "current_location": [73.8570, 18.5010],  # Swargate Hub
-                "target_location": None,
-                "current_incident_id": None,
-                "active_route": None,
-                "previous_route": None,
-                "route_progress": 0.0,
-                "speed_multiplier": 1.0,
-                "speed_kmh": 45.0,
-                "eta_minutes": 0.0,
-                "patients_onboard": 0,
-                "patient_capacity": 2
-            },
-            {
-                "ambulance_id": "AMB-04",
-                "callsign": "Ambulance 04",
-                "type": "ALS",
-                "status": "AVAILABLE",
-                "assigned_zone": "Z3",
-                "current_location": [73.8744, 18.5284],  # Sassoon General Hospital
-                "target_location": None,
-                "current_incident_id": None,
-                "active_route": None,
-                "previous_route": None,
-                "route_progress": 0.0,
-                "speed_multiplier": 1.0,
-                "speed_kmh": 45.0,
-                "eta_minutes": 0.0,
-                "patients_onboard": 0,
-                "patient_capacity": 2
-            }
-        ]
+                "patient_capacity": int(item.get("patient_capacity", 2)),
+                "password": item.get("password", "demo123")
+            })
+
+        self.ambulance_credentials = {
+            a["ambulance_id"]: a.get("password", "demo123")
+            for a in self.ambulances
+        }
+        self.save_fleet_registry()
 
         self.incidents = []
         self.medical_camps = []
@@ -240,11 +250,37 @@ class SimulationEngine:
                     self.log_event(f"Road {road['name']} ({road['road_id']}) {status}: Water depth {depth:.2f}m.", "info")
 
         # High-ground flood-safe staging bases for proactive vehicle self-preservation
+        # High-ground flood-safe staging bases across all sectors in Pune
         SAFE_STAGING_BASES = [
-            {"name": "Sassoon Trauma Core Base", "coords": [73.8744, 18.5284], "zone": "Z3"},
-            {"name": "Kothrud Stand Base", "coords": [73.8120, 18.5070], "zone": "Z8"},
-            {"name": "Camp MG Road Base", "coords": [73.8760, 18.5150], "zone": "Z6"},
+            # Zone 1 (Shivajinagar / Model Colony / North Sector)
             {"name": "Shivajinagar North Base", "coords": [73.8512, 18.5312], "zone": "Z1"},
+            {"name": "Model Colony Safe Stand", "coords": [73.8370, 18.5370], "zone": "Z1"},
+            {"name": "FC Road Safe Haven", "coords": [73.8420, 18.5260], "zone": "Z1"},
+            # Zone 2 (Kasba / Shaniwar Wada Sector)
+            {"name": "Kasba Peth High Ground", "coords": [73.8580, 18.5180], "zone": "Z2"},
+            {"name": "Budhwar Peth Safe Hub", "coords": [73.8560, 18.5140], "zone": "Z2"},
+            # Zone 3 (Sassoon / Station / Central Sector)
+            {"name": "Sassoon Trauma Core Base", "coords": [73.8744, 18.5284], "zone": "Z3"},
+            {"name": "Pune Station North Stand", "coords": [73.8750, 18.5330], "zone": "Z3"},
+            {"name": "Maldhakka Safe Stand", "coords": [73.8690, 18.5260], "zone": "Z3"},
+            # Zone 4 (Deccan Gymkhana / Karve Road / West Sector)
+            {"name": "BMCC Deccan High Ground", "coords": [73.8340, 18.5210], "zone": "Z4"},
+            {"name": "Law College Road Stand", "coords": [73.8280, 18.5150], "zone": "Z4"},
+            {"name": "Prabhat Road Sector Stand", "coords": [73.8310, 18.5090], "zone": "Z4"},
+            # Zone 5 (Swargate / Parvati / South Sector)
+            {"name": "Parvati Foothill Safe Stand", "coords": [73.8480, 18.4980], "zone": "Z5"},
+            {"name": "Swargate Flyover High Ground", "coords": [73.8610, 18.5030], "zone": "Z5"},
+            {"name": "Satara Road Safe Stand", "coords": [73.8570, 18.4890], "zone": "Z5"},
+            # Zone 6 (Camp / MG Road / East Sector)
+            {"name": "Camp MG Road Base", "coords": [73.8760, 18.5150], "zone": "Z6"},
+            {"name": "East Street Elevated Hub", "coords": [73.8810, 18.5190], "zone": "Z6"},
+            # Zone 7 (Yerawada / Bund Garden North Sector)
+            {"name": "Yerawada Jail Road Stand", "coords": [73.8810, 18.5490], "zone": "Z7"},
+            {"name": "Airport Road High Ground", "coords": [73.8920, 18.5560], "zone": "Z7"},
+            # Zone 8 (Kothrud / Paud Road Sector)
+            {"name": "Kothrud Stand Base", "coords": [73.8120, 18.5070], "zone": "Z8"},
+            {"name": "Paud Road Safe Sector", "coords": [73.8050, 18.5040], "zone": "Z8"},
+            {"name": "Mayur Colony High Ground", "coords": [73.8160, 18.5010], "zone": "Z8"},
         ]
 
         # 3A. Check for Ambulances Trapped in Floodwaters (Scenario 2B)
@@ -451,25 +487,31 @@ class SimulationEngine:
                                 "critical"
                             )
 
-            # --- CASE 3: IDLE AMBULANCE PROACTIVE RELOCATION (Scenario 4) ---
-            elif amb["status"] in ["AVAILABLE", "IDLE"] and not amb.get("current_incident_id"):
+            # --- CASE 3: IDLE / POST-MISSION AMBULANCE PROACTIVE RELOCATION (Scenario 4) ---
+            elif amb.get("status") in ["AVAILABLE", "IDLE", "COMPLETED", "AT_HOSPITAL"] and not amb.get("current_incident_id"):
                 curr_pos = amb["current_location"]
                 _, depth, dist_to_flood_m = self.flood_engine.is_location_flooded(
                     curr_pos[0], curr_pos[1], self.flood_poly, self.water_rise_m
                 )
-                if dist_to_flood_m < 200.0 or depth > 0.05:
-                    # Encroaching floodwaters near idle ambulance!
+                # Generous safety trigger: if flood is encroaching within 600m or water starts lapping (depth > 0.01m)
+                if dist_to_flood_m < 600.0 or depth > 0.01:
+                    # Sort safe bases strictly by distance to current ambulance location to pick the CLOSEST local safe haven
+                    sorted_bases = sorted(
+                        SAFE_STAGING_BASES,
+                        key=lambda b: (b["coords"][0] - curr_pos[0])**2 + (b["coords"][1] - curr_pos[1])**2
+                    )
                     best_base = None
                     best_route = None
-                    for base in SAFE_STAGING_BASES:
+                    for base in sorted_bases:
                         b_flooded, _, b_dist = self.flood_engine.is_location_flooded(
                             base["coords"][0], base["coords"][1], self.flood_poly, self.water_rise_m
                         )
-                        if not b_flooded and b_dist > 300.0:
+                        if not b_flooded and b_dist > 250.0:
                             r = self.routing_graph.calculate_route(curr_pos, base["coords"])
-                            if r and (best_route is None or r["duration_min"] < best_route["duration_min"]):
+                            if r:
                                 best_route = r
                                 best_base = base
+                                break  # Closest reachable unflooded safe ground found!
                     if best_base and best_route:
                         amb["status"] = "RELOCATING_TO_SAFETY"
                         amb["target_location"] = best_base["coords"]
@@ -479,8 +521,13 @@ class SimulationEngine:
                         amb["previous_route"] = None
                         amb["route_progress"] = 0.0
                         amb["eta_minutes"] = best_route["duration_min"]
+                        amb["is_trapped"] = False
+                        amb_id_str = amb["ambulance_id"]
+                        b_name_str = best_base["name"]
+                        dist_km_str = f"{best_route['distance_km']:.1f}"
+                        eta_str = f"{best_route['duration_min']:.1f}"
                         self.log_event(
-                            f"🛡️ PROACTIVE FLEET RELOCATION: Encroaching floodwaters ({dist_to_flood_m:.0f}m away) detected near idle {amb['ambulance_id']}. Auto-relocating to flood-safe staging at {best_base['name']} (ETA {best_route['duration_min']:.1f}m).",
+                            f"??? PROACTIVE LOCAL RELOCATION: Encroaching floodwaters ({dist_to_flood_m:.0f}m away) detected near idle {amb_id_str}. Relocating to nearby safe staging ground at {b_name_str} ({dist_km_str} km away, ETA {eta_str}m).",
                             "alert"
                         )
 
@@ -572,7 +619,8 @@ class SimulationEngine:
                 inc["status"] = "RESOLVED"
                 break
 
-        amb["status"] = "COMPLETED"
+        amb["status"] = "AVAILABLE"  # Ready for next mission & flood evacuation!
+        amb["is_trapped"] = False
         amb["patients_onboard"] = 0
         amb["active_route"] = None
         amb["previous_route"] = None
@@ -905,6 +953,26 @@ class SimulationEngine:
         self.log_event("Demo scenario loaded: 4 ambulances staged across distinct zones. Flood active along Mutha riverbed.", "alert")
 
 
+    def save_fleet_registry(self):
+        """Persists commissioned fleet to disk so admin additions and deletions survive resets."""
+        try:
+            records = []
+            for a in self.ambulances:
+                records.append({
+                    "ambulance_id": a["ambulance_id"],
+                    "callsign": a.get("callsign", a["ambulance_id"]),
+                    "type": a.get("type", "ALS"),
+                    "assigned_zone": a.get("assigned_zone", "Z1"),
+                    "base_location": a.get("base_location", a.get("current_location", [73.8512, 18.5312])),
+                    "speed_kmh": a.get("speed_kmh", 45.0),
+                    "patient_capacity": a.get("patient_capacity", 2),
+                    "password": a.get("password", "demo123")
+                })
+            with open("data/processed/fleet_registry.json", "w", encoding="utf-8") as f:
+                json.dump(records, f, indent=2)
+        except Exception as e:
+            print(f"Error saving fleet registry: {e}")
+
     def get_ambulance_credentials(self) -> Dict[str, str]:
         if not hasattr(self, "ambulance_credentials") or not self.ambulance_credentials:
             self.ambulance_credentials = {}
@@ -966,8 +1034,10 @@ class SimulationEngine:
             "password": password
         }
 
+        new_amb["base_location"] = list(loc)
         self.ambulances.append(new_amb)
         self.get_ambulance_credentials()[raw_id] = password
+        self.save_fleet_registry()
         self.log_event(
             f"?? NEW AMBULANCE ADDED: {raw_id} ({callsign}, {vtype}) deployed to Zone {zone_id} staging.",
             "info"
@@ -1000,6 +1070,7 @@ class SimulationEngine:
         creds = self.get_ambulance_credentials()
         if aid in creds:
             del creds[aid]
+        self.save_fleet_registry()
 
         self.log_event(
             f"??? AMBULANCE DECOMMISSIONED: Unit {aid} ({amb.get('callsign')}) removed from active fleet.",

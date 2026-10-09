@@ -13,6 +13,7 @@ interface CityMap3DProps {
   onMapClickForEmergency?: (coords: [number, number]) => void;
   onSelectObject?: (type: 'road' | 'hospital' | 'ambulance' | 'zone' | 'incident' | 'camp', data: any) => void;
   focusAmbulanceId?: string | null;
+  realGpsCoords?: [number, number] | null;
 }
 
 export const CityMap3D: React.FC<CityMap3DProps> = ({
@@ -20,6 +21,7 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
   onMapClickForEmergency,
   onSelectObject,
   focusAmbulanceId,
+  realGpsCoords,
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -480,14 +482,18 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
       const key = `amb-${amb.ambulance_id}`;
       currentMarkerKeys.add(key);
 
+      const isLiveGpsActive = Boolean(focusAmbulanceId === amb.ambulance_id && realGpsCoords);
+      const markerLocation: [number, number] = isLiveGpsActive ? realGpsCoords! : amb.current_location;
+
       const isTrapped = amb.status === 'TRAPPED_IN_FLOOD';
       const isRelocating = amb.status === 'RELOCATING_TO_SAFETY';
       const isResponding = amb.status.includes('EN_ROUTE') || amb.status === 'CALL_RECEIVED' || amb.status === 'AT_PATIENT';
       
-      const statusColor = isTrapped ? 'bg-red-600' : isRelocating ? 'bg-amber-400' : isResponding ? 'bg-amber-500' : 'bg-blue-600';
+      const statusColor = isLiveGpsActive ? 'bg-cyan-400' : isTrapped ? 'bg-red-600' : isRelocating ? 'bg-amber-400' : isResponding ? 'bg-amber-500' : 'bg-blue-600';
       const patients = amb.patients_onboard || 0;
       
-      const label = isTrapped ? `${amb.ambulance_id} • 🆘 TRAPPED IN FLOOD` :
+      const label = isLiveGpsActive ? `${amb.ambulance_id} • 📡 LIVE GPS` :
+                    isTrapped ? `${amb.ambulance_id} • 🆘 TRAPPED IN FLOOD` :
                     isRelocating ? `${amb.ambulance_id} • 🛡️ EVACUATING (${amb.eta_minutes.toFixed(1)}m)` :
                     amb.status === 'EN_ROUTE_TO_PATIENT' ? `${amb.ambulance_id} • SCENE (${amb.eta_minutes.toFixed(1)}m)` :
                     amb.status === 'EN_ROUTE_TO_HOSPITAL' ? (amb.diverted_hospital ? `${amb.ambulance_id} • 🚨 DIVERTED (${amb.eta_minutes.toFixed(1)}m)` : `${amb.ambulance_id} • HOSP (${amb.eta_minutes.toFixed(1)}m)`) :
@@ -495,7 +501,8 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
                     amb.status === 'CALL_RECEIVED' ? `${amb.ambulance_id} • DISPATCHED` :
                     amb.ambulance_id;
 
-      const pillClass = isTrapped ? 'bg-red-700 ring-4 ring-red-400 shadow-2xl animate-pulse' :
+      const pillClass = isLiveGpsActive ? 'bg-cyan-600 ring-4 ring-cyan-300 shadow-2xl animate-pulse' :
+                        isTrapped ? 'bg-red-700 ring-4 ring-red-400 shadow-2xl animate-pulse' :
                         isRelocating ? 'bg-amber-600 ring-2 ring-amber-300 shadow-xl' :
                         isResponding ? 'bg-blue-700 ring-2 ring-amber-400 shadow-amber-500/20' :
                         'bg-slate-900 ring-1 ring-slate-700';
@@ -510,12 +517,16 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
                 <span>${amb.ambulance_id}</span>
                 <span class="text-[10px] text-slate-400 font-normal">(${amb.type})</span>
               </span>
-              <span class="text-[9px] px-1.5 py-0.5 rounded font-black ${isTrapped ? 'bg-red-600 text-white animate-bounce' : isResponding ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-slate-800 text-slate-300'}">
-                ${amb.status.replace(/_/g, ' ')}
+              <span class="text-[9px] px-1.5 py-0.5 rounded font-black ${isLiveGpsActive ? 'bg-cyan-500 text-slate-950' : isTrapped ? 'bg-red-600 text-white animate-bounce' : isResponding ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-slate-800 text-slate-300'}">
+                ${isLiveGpsActive ? 'HARDWARE LIVE GPS' : amb.status.replace(/_/g, ' ')}
               </span>
             </div>
             
             <div class="space-y-1 text-[11px] text-slate-300">
+              ${isLiveGpsActive ? `
+              <div class="p-1.5 bg-cyan-950/80 border border-cyan-400/60 rounded-lg text-cyan-200 font-bold text-[10px] leading-tight">
+                📡 LIVE HARDWARE GPS LOCK: Streaming real-time telemetry from operator device.
+              </div>` : ''}
               ${isTrapped ? `
               <div class="p-1.5 bg-red-950/80 border border-red-500/60 rounded-lg text-red-200 font-bold text-[10px] leading-tight">
                 🆘 MAYDAY: Vehicle immobilised by severe floodwaters! Engine stalled. Urgent boat rescue needed.
@@ -558,7 +569,7 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
             <span class="px-1.5 py-0.2 text-[10px] rounded font-black ${patients > 0 ? 'bg-amber-400 text-slate-950 shadow-xs' : 'bg-slate-800 text-slate-300 border border-slate-700'}">
               👥 ${patients}/2
             </span>
-            <span class="w-2 h-2 rounded-full ${statusColor} ${isResponding || isTrapped ? 'animate-ping' : ''}"></span>
+            <span class="w-2 h-2 rounded-full ${statusColor} ${isResponding || isTrapped || isLiveGpsActive ? 'animate-ping' : ''}"></span>
           </div>
           <div class="w-1.5 h-2 bg-slate-900"></div>
         </div>
@@ -575,10 +586,10 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
         };
 
         markersRef.current[key] = new maplibregl.Marker({ element: el })
-          .setLngLat(amb.current_location)
+          .setLngLat(markerLocation)
           .addTo(map);
       } else {
-        markersRef.current[key].setLngLat(amb.current_location);
+        markersRef.current[key].setLngLat(markerLocation);
         const el = markersRef.current[key].getElement();
         el.innerHTML = markerInnerHtml;
         el.onclick = (e) => {
@@ -707,7 +718,14 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
     });
 
     // If focused on an ambulance (e.g. Ambulance view), follow vehicle smoothly
-    if (focusAmbulanceId) {
+    // Follow real device GPS if streaming, otherwise follow focused simulated ambulance
+    if (realGpsCoords) {
+      map.easeTo({
+        center: realGpsCoords,
+        zoom: 15.5,
+        duration: 800,
+      });
+    } else if (focusAmbulanceId) {
       const targetAmb = state.ambulances.find((a) => a.ambulance_id === focusAmbulanceId);
       if (targetAmb) {
         map.easeTo({
@@ -716,7 +734,7 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
         });
       }
     }
-  }, [state, focusAmbulanceId, isCreateMode]);
+  }, [state, focusAmbulanceId, isCreateMode, realGpsCoords]);
 
   const toggle2D3D = () => {
     const map = mapRef.current;

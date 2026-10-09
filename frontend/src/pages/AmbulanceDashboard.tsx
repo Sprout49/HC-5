@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useSimulation } from '../context/SimulationContext';
 import { useAuth } from '../context/AuthContext';
 import { CityMap3D } from '../components/map/CityMap3D';
@@ -11,6 +12,7 @@ import {
   LogOut,
   Shield,
 } from 'lucide-react';
+import { GoogleMapsNavHUD } from '../components/ambulance/GoogleMapsNavHUD';
 
 interface AmbulanceDashboardProps {
   activeTab?: 'admin' | 'ambulance';
@@ -21,6 +23,44 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
   const { state, acceptCall, pickupPatient, startHospitalRoute } = useSimulation();
   const { ambulanceUser, logoutAmbulance } = useAuth();
   const activeAmbulanceId = ambulanceUser?.ambulance_id || 'AMB-01';
+
+  // Live Hardware GPS Telemetry State (for Judge Demonstration)
+  const [useRealGps, setUseRealGps] = useState(false);
+  const [deviceGpsCoords, setDeviceGpsCoords] = useState<[number, number] | null>(null);
+  const [gpsAccuracy, setGpsAccuracy] = useState<number | null>(null);
+  const [gpsError, setGpsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!useRealGps) {
+      setDeviceGpsCoords(null);
+      setGpsAccuracy(null);
+      setGpsError(null);
+      return;
+    }
+
+    if (!('geolocation' in navigator)) {
+      setGpsError('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        setDeviceGpsCoords([pos.coords.longitude, pos.coords.latitude]);
+        setGpsAccuracy(pos.coords.accuracy);
+        setGpsError(null);
+      },
+      (err) => {
+        setGpsError(err.message || 'Unable to retrieve hardware GPS fix.');
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 1000,
+        timeout: 10000,
+      }
+    );
+
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, [useRealGps]);
 
   const currentAmbulance = state?.ambulances.find((a) => a.ambulance_id === activeAmbulanceId);
   const currentIncident = state?.incidents.find(
@@ -53,6 +93,20 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
 
         {/* Right Section: Driver Session & Controls */}
         <div className="flex items-center gap-3">
+          {/* Live Hardware GPS Toggle for Judges */}
+          <button
+            onClick={() => setUseRealGps(!useRealGps)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              useRealGps
+                ? 'bg-cyan-600 text-white shadow-md shadow-cyan-500/30 ring-2 ring-cyan-400 animate-pulse'
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+            }`}
+            title={useRealGps ? 'Click to return to Simulated Pune Flood Grid' : 'Click to stream real device GPS hardware coordinates (Judge Demo)'}
+          >
+            <Radio className={`w-3.5 h-3.5 ${useRealGps ? 'text-white animate-ping' : 'text-slate-500'}`} />
+            <span>{useRealGps ? '?? LIVE DEVICE GPS FEED' : '??? GPS: Pune Sim Grid'}</span>
+          </button>
+
           <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200/80 rounded-xl">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs font-black text-emerald-950">
@@ -76,7 +130,73 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
 
       {/* 2. 3D NAVIGATION MAP CENTERED ON AMBULANCE */}
       <main className="flex-1 relative w-full h-full">
-        <CityMap3D focusAmbulanceId={activeAmbulanceId} />
+        {/* Live GPS Telemetry Stream Banner (For Judges) */}
+        {useRealGps && (
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 z-30 bg-slate-900/95 backdrop-blur-md border border-cyan-500/60 text-white px-5 py-3 rounded-2xl shadow-2xl flex flex-wrap items-center gap-4 animate-in slide-in-from-top-4 duration-200">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
+              <span className="text-xs font-black text-cyan-400 tracking-wider uppercase">
+                IoT Telemetry Stream Active
+              </span>
+            </div>
+            {deviceGpsCoords ? (
+              <div className="flex items-center gap-3 text-xs font-mono text-slate-200">
+                <span>Lat: {deviceGpsCoords[1].toFixed(5)}?</span>
+                <span>?</span>
+                <span>Lon: {deviceGpsCoords[0].toFixed(5)}?</span>
+                {gpsAccuracy !== null && (
+                  <span className="text-[10px] text-cyan-300 font-sans font-bold bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-500/30">
+                    ?{gpsAccuracy.toFixed(1)}m precision
+                  </span>
+                )}
+              </div>
+            ) : gpsError ? (
+              <span className="text-xs text-rose-400 font-semibold">{gpsError}</span>
+            ) : (
+              <span className="text-xs text-slate-400 italic">Acquiring live hardware satellite lock...</span>
+            )}
+            <button
+              onClick={() => setUseRealGps(false)}
+              className="px-2.5 py-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 hover:text-white rounded-lg text-xs font-bold border border-cyan-500/40 transition-colors cursor-pointer"
+            >
+              Return to Pune Flood Sim
+            </button>
+          </div>
+        )}
+
+        <CityMap3D
+          focusAmbulanceId={activeAmbulanceId}
+          realGpsCoords={useRealGps ? deviceGpsCoords : null}
+        />
+
+        {/* TURN-BY-TURN GOOGLE MAPS STYLE HUD (En Route / Relocating) */}
+        {currentAmbulance?.active_route?.route_coordinates &&
+          currentAmbulance.active_route.route_coordinates.length > 1 &&
+          (currentAmbulance.status === 'EN_ROUTE_TO_PATIENT' ||
+            currentAmbulance.status === 'EN_ROUTE_TO_HOSPITAL' ||
+            currentAmbulance.status === 'RELOCATING_TO_SAFETY' ||
+            (currentAmbulance.route_progress || 0) > 0) && (
+            <div className={`absolute left-1/2 -translate-x-1/2 w-full max-w-xl px-4 z-20 pointer-events-auto transition-all ${
+              useRealGps ? 'top-32' : 'top-4'
+            }`}>
+              <GoogleMapsNavHUD
+                activeRoute={currentAmbulance.active_route.route_coordinates}
+                routeProgress={currentAmbulance.route_progress || 0}
+                destinationName={
+                  currentAmbulance.status === 'EN_ROUTE_TO_PATIENT'
+                    ? (currentIncident ? `Patient Scene (${currentIncident.severity})` : 'Patient Location')
+                    : currentAmbulance.status === 'EN_ROUTE_TO_HOSPITAL'
+                    ? (currentAmbulance.target_hospital_name || 'Hospital Trauma Unit')
+                    : currentAmbulance.status === 'RELOCATING_TO_SAFETY'
+                    ? (currentAmbulance.safe_staging_name || 'Elevated Safe Staging Hub')
+                    : 'Designated Target'
+                }
+                speedKmh={currentAmbulance.speed_kmh}
+                status={currentAmbulance.status}
+                isTrapped={currentAmbulance.is_trapped || currentAmbulance.status === 'TRAPPED_IN_FLOOD'}
+              />
+            </div>
+          )}
 
         {/* FLOATING NAVIGATION CARD AT BOTTOM */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-xl px-4 z-20 pointer-events-none">

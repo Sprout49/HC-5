@@ -1,0 +1,67 @@
+[
+  {
+    "ambulance_id": "AMB-01",
+    "callsign": "Ambulance 01",
+    "type": "ALS",
+    "assigned_zone": "Z1",
+    "base_location": [
+      73.8512,
+      18.5312
+    ],
+    "speed_kmh": 45.0,
+    "patient_capacity": 2,
+    "password": "demo123"
+  },
+  {
+    "ambulance_id": "AMB-02",
+    "callsign": "Ambulance 02",
+    "type": "BLS",
+    "assigned_zone": "Z4",
+    "base_location": [
+      73.839,
+      18.517
+    ],
+    "speed_kmh": 45.0,
+    "patient_capacity": 2,
+    "password": "demo123"
+  },
+  {
+    "ambulance_id": "AMB-03",
+    "callsign": "Ambulance 03",
+    "type": "ALS",
+    "assigned_zone": "Z5",
+    "base_location": [
+      73.857,
+      18.501
+    ],
+    "speed_kmh": 45.0,
+    "patient_capacity": 2,
+    "password": "demo123"
+  },
+  {
+    "ambulance_id": "AMB-04",
+    "callsign": "Ambulance 04",
+    "type": "ALS",
+    "assigned_zone": "Z3",
+    "base_location": [
+      73.8744,
+      18.5284
+    ],
+    "speed_kmh": 45.0,
+    "patient_capacity": 2,
+    "password": "demo123"
+  },
+  {
+    "ambulance_id": "AMB-05",
+    "callsign": "Yerwada",
+    "type": "ALS",
+    "assigned_zone": "Z7",
+    "base_location": [
+      73.881,
+      18.549
+    ],
+    "speed_kmh": 45.0,
+    "patient_capacity": 2,
+    "password": "demo123"
+  }
+]

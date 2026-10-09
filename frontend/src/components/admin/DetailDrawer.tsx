@@ -1,5 +1,6 @@
 import { X, Navigation2, Check, Ambulance as AmbulanceIcon } from 'lucide-react';
 import { useSimulation } from '../../context/SimulationContext';
+import { GoogleMapsNavHUD } from '../ambulance/GoogleMapsNavHUD';
 
 interface DetailDrawerProps {
   selectedObject: {
@@ -185,21 +186,32 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({ selectedObject, onCl
             </div>
 
             {data.active_route && (
-              <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-100 space-y-2">
-                <div className="flex items-center justify-between font-bold text-blue-900">
-                  <span>Active Destination</span>
-                  <span>ETA: {data.eta_minutes.toFixed(1)} min</span>
-                </div>
-                <div className="text-[11px] text-slate-600 flex justify-between">
-                  <span>Distance: {data.active_route.distance_km} km</span>
-                  <span>Risk: <strong className={data.active_route.risk_rating === 'LOW' ? 'text-emerald-700' : 'text-amber-700'}>{data.active_route.risk_rating}</strong></span>
-                </div>
-                {data.active_route.explanation && (
-                  <div className="p-2 bg-white/90 rounded-lg border border-blue-200/60 text-[11px] text-blue-950 font-medium leading-relaxed">
-                    <span className="text-blue-700 font-bold block mb-0.5">🛡️ Route Selection Decision:</span>
-                    <span>{data.active_route.explanation}</span>
+              <div className="space-y-2">
+                <GoogleMapsNavHUD
+                  activeRoute={data.active_route.route_coordinates}
+                  routeProgress={data.route_progress || 0}
+                  destinationName={data.target_hospital_name || data.safe_staging_name || 'Designated Target'}
+                  speedKmh={data.speed_kmh}
+                  status={data.status}
+                  isTrapped={data.is_trapped || data.status === 'TRAPPED_IN_FLOOD'}
+                />
+
+                <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-100 space-y-2">
+                  <div className="flex items-center justify-between font-bold text-blue-900">
+                    <span>Active Destination</span>
+                    <span>ETA: {data.eta_minutes.toFixed(1)} min</span>
                   </div>
-                )}
+                  <div className="text-[11px] text-slate-600 flex justify-between">
+                    <span>Distance: {data.active_route.distance_km} km</span>
+                    <span>Risk: <strong className={data.active_route.risk_rating === 'LOW' ? 'text-emerald-700' : 'text-amber-700'}>{data.active_route.risk_rating}</strong></span>
+                  </div>
+                  {data.active_route.explanation && (
+                    <div className="p-2 bg-white/90 rounded-lg border border-blue-200/60 text-[11px] text-blue-950 font-medium leading-relaxed">
+                      <span className="text-blue-700 font-bold block mb-0.5">🛡️ Route Selection Decision:</span>
+                      <span>{data.active_route.explanation}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </>
