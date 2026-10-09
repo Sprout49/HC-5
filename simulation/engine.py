@@ -75,10 +75,16 @@ class SimulationEngine:
                 self.hospitals[i]["coordinates"] = feat["geometry"]["coordinates"]
 
         # Initial Ambulances fleet with realistic Pune staging coordinates
-        # Persistent Fleet Registry (Preserves Admin additions across simulation resets)
+        # Persistent Fleet Registry (Preserves Admin additions across simulation resets via Supabase & Local)
         fleet_registry_path = "data/processed/fleet_registry.json"
         persistent_fleet = None
-        if os.path.exists(fleet_registry_path):
+        try:
+            from backend.app.core.database import load_ambulances_from_db
+            persistent_fleet = load_ambulances_from_db()
+        except Exception:
+            persistent_fleet = None
+
+        if not persistent_fleet and os.path.exists(fleet_registry_path):
             try:
                 with open(fleet_registry_path, "r", encoding="utf-8") as f:
                     persistent_fleet = json.load(f)
@@ -970,6 +976,13 @@ class SimulationEngine:
                 })
             with open("data/processed/fleet_registry.json", "w", encoding="utf-8") as f:
                 json.dump(records, f, indent=2)
+            
+            # Sync to Supabase cloud database
+            try:
+                from backend.app.core.database import sync_ambulances_to_db
+                sync_ambulances_to_db(self.ambulances)
+            except Exception:
+                pass
         except Exception as e:
             print(f"Error saving fleet registry: {e}")
 
@@ -1071,6 +1084,12 @@ class SimulationEngine:
         if aid in creds:
             del creds[aid]
         self.save_fleet_registry()
+
+        try:
+            from backend.app.core.database import delete_ambulance_from_db
+            delete_ambulance_from_db(aid)
+        except Exception:
+            pass
 
         self.log_event(
             f"??? AMBULANCE DECOMMISSIONED: Unit {aid} ({amb.get('callsign')}) removed from active fleet.",
