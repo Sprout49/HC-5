@@ -136,6 +136,30 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({ selectedObject, onCl
               </span>
             </div>
 
+            {data.status === 'TRAPPED_IN_FLOOD' && (
+              <div className="p-3 bg-red-100 rounded-2xl border-2 border-red-500 text-xs text-red-950 space-y-1 animate-pulse">
+                <span className="font-extrabold text-red-900 flex items-center gap-1.5 text-xs">
+                  <span>🆘</span>
+                  <span>VEHICLE TRAPPED IN FLOODWATERS</span>
+                </span>
+                <p className="text-[11px] text-red-800 leading-snug">
+                  Ambulance stalled due to deep floodwaters. Vehicle immobilised. Central Command notified for NDRF boat extraction.
+                </p>
+              </div>
+            )}
+
+            {data.status === 'RELOCATING_TO_SAFETY' && (
+              <div className="p-3 bg-amber-50 rounded-2xl border-2 border-amber-400 text-xs text-amber-950 space-y-1">
+                <span className="font-extrabold text-amber-900 flex items-center gap-1.5 text-xs">
+                  <span>🛡️</span>
+                  <span>AUTONOMOUS FLOOD EVACUATION</span>
+                </span>
+                <p className="text-[11px] text-amber-800 leading-snug">
+                  Proactively relocating to safe high-ground base ({data.safe_staging_name || 'Safe Core'}) before rising water cuts off staging post.
+                </p>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-2">
               <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
                 <span className="text-slate-400 block text-[10px] uppercase font-bold">Vehicle Unit</span>
@@ -243,13 +267,52 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({ selectedObject, onCl
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
                 <span className="text-slate-600 font-medium">Status</span>
                 <span className={`px-2 py-0.5 rounded-full font-bold text-[11px] ${
+                  data.status === 'UNREACHABLE_FLOODED' ? 'bg-purple-100 text-purple-900 border border-purple-300' :
+                  data.status === 'PREDICTED_FLOOD_SUBMERGENCE' ? 'bg-rose-100 text-rose-900 border border-rose-300' :
+                  data.status === 'AMBULANCE_TRAPPED' ? 'bg-red-100 text-red-900 border border-red-300' :
                   data.status === 'DISPATCHED' ? 'bg-blue-100 text-blue-800' :
                   data.status === 'RESOLVED' ? 'bg-emerald-100 text-emerald-800' :
                   'bg-amber-100 text-amber-800'
                 }`}>
-                  {data.status || 'PENDING_DISPATCH'}
+                  {data.status ? data.status.replace(/_/g, ' ') : 'PENDING DISPATCH'}
                 </span>
               </div>
+
+              {data.status === 'UNREACHABLE_FLOODED' && (
+                <div className="p-3 bg-purple-50 rounded-2xl border-2 border-purple-400 text-xs text-purple-950 space-y-1">
+                  <span className="font-extrabold text-purple-900 flex items-center gap-1.5 text-xs">
+                    <span>🚤</span>
+                    <span>NDRF / SDRF BOAT RESCUE REQUIRED</span>
+                  </span>
+                  <p className="text-[11px] text-purple-800 leading-snug">
+                    {data.unreachable_reason || 'Incident location is submerged in floodwaters. Ground road ambulances cannot reach. Ground dispatch stopped.'}
+                  </p>
+                </div>
+              )}
+
+              {data.status === 'PREDICTED_FLOOD_SUBMERGENCE' && (
+                <div className="p-3 bg-rose-50 rounded-2xl border-2 border-rose-400 text-xs text-rose-950 space-y-1">
+                  <span className="font-extrabold text-rose-900 flex items-center gap-1.5 text-xs">
+                    <span>⚠️</span>
+                    <span>PREDICTED FLOOD INUNDATION CUTOFF</span>
+                  </span>
+                  <p className="text-[11px] text-rose-800 leading-snug">
+                    {data.unreachable_reason || 'Incident location predicted to be submerged by floodwaters before vehicle arrival. Ground response aborted.'}
+                  </p>
+                </div>
+              )}
+
+              {data.status === 'AMBULANCE_TRAPPED' && (
+                <div className="p-3 bg-red-100 rounded-2xl border-2 border-red-500 text-xs text-red-950 space-y-1">
+                  <span className="font-extrabold text-red-900 flex items-center gap-1.5 text-xs">
+                    <span>🆘</span>
+                    <span>ASSIGNED AMBULANCE TRAPPED IN FLOOD</span>
+                  </span>
+                  <p className="text-[11px] text-red-800 leading-snug">
+                    {data.unreachable_reason || 'The responding unit became trapped in rising floodwaters and is immobilised. Urgent assistance requested.'}
+                  </p>
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">

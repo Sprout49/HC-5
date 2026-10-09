@@ -31,12 +31,26 @@ class ModelRegistry:
         return cls._instance
 
     def load_models(self):
-        if os.path.exists("models/demand_model.pkl"):
-            self.demand_model_data = joblib.load("models/demand_model.pkl")
-        if os.path.exists("models/risk_model.pkl"):
-            self.risk_model_data = joblib.load("models/risk_model.pkl")
-        if os.path.exists("models/road_access_model.pkl"):
-            self.road_model_data = joblib.load("models/road_access_model.pkl")
+        try:
+            if os.path.exists("models/demand_model.pkl"):
+                self.demand_model_data = joblib.load("models/demand_model.pkl")
+        except Exception as e:
+            print(f"Notice: Using deterministic demand formulation ({e})")
+            self.demand_model_data = None
+
+        try:
+            if os.path.exists("models/risk_model.pkl"):
+                self.risk_model_data = joblib.load("models/risk_model.pkl")
+        except Exception as e:
+            print(f"Notice: Using deterministic risk formulation ({e})")
+            self.risk_model_data = None
+
+        try:
+            if os.path.exists("models/road_access_model.pkl"):
+                self.road_model_data = joblib.load("models/road_access_model.pkl")
+        except Exception as e:
+            print(f"Notice: Using hydraulic road evaluation ({e})")
+            self.road_model_data = None
 
     def predict_zone_demand(self, zone_props: Dict[str, Any], flood_water_rise_m: float, sim_minute: float) -> float:
         feats = extract_zone_demand_features(zone_props, flood_water_rise_m, sim_minute)

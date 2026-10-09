@@ -10,7 +10,10 @@ export type AmbulanceStatus =
   | 'EN_ROUTE_TO_HOSPITAL' 
   | 'AT_HOSPITAL' 
   | 'COMPLETED' 
-  | 'BLOCKED_NO_ROUTE';
+  | 'BLOCKED_NO_ROUTE'
+  | 'TRAPPED_IN_FLOOD'
+  | 'RELOCATING_TO_SAFETY'
+  | 'BLOCKED_NO_HOSPITAL';
 
 export interface Zone {
   zone_id: string;
@@ -90,6 +93,9 @@ export interface Ambulance {
   eta_minutes: number;
   patients_onboard?: number;
   patient_capacity?: number;
+  is_trapped?: boolean;
+  safe_staging_name?: string;
+  diverted_hospital?: boolean;
 }
 
 export interface Incident {
@@ -98,10 +104,13 @@ export interface Incident {
   zone_id: string;
   severity: SeverityLevel;
   patient_count: number;
-  status: 'PENDING_DISPATCH' | 'DISPATCHED' | 'PICKED_UP' | 'RESOLVED';
+  status: 'PENDING_DISPATCH' | 'DISPATCHED' | 'PICKED_UP' | 'RESOLVED' | 'UNREACHABLE_FLOODED' | 'PREDICTED_FLOOD_SUBMERGENCE' | 'AMBULANCE_TRAPPED';
   created_time: number;
   assigned_ambulance_id: string | null;
   target_hospital_id: string | null;
+  is_unreachable?: boolean;
+  unreachable_reason?: string;
+  flood_risk_warning?: string;
 }
 
 export interface MedicalCamp {

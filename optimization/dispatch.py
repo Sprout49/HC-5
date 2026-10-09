@@ -22,7 +22,9 @@ def select_best_ambulance(
     """
     available_ambulances = [
         a for a in ambulances
-        if a.get("status") in ["AVAILABLE", "IDLE"]
+        if a.get("status") in ["AVAILABLE", "IDLE"] 
+        and not a.get("is_trapped") 
+        and a.get("status") not in ["TRAPPED_IN_FLOOD", "RELOCATING_TO_SAFETY"]
     ]
 
     if not available_ambulances:

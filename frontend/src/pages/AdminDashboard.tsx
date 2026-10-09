@@ -392,23 +392,40 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
               ) : (
                 state?.incidents
                   .filter((i) => i.status !== 'RESOLVED')
-                  .map((inc) => (
-                    <div
-                      key={inc.incident_id}
-                      onClick={() => setSelectedObject({ type: 'incident', data: inc })}
-                      className="p-2 rounded-xl bg-red-50/70 border border-red-100 flex items-center justify-between text-xs cursor-pointer hover:bg-red-100/70 transition-colors"
-                    >
-                      <div>
-                        <span className="font-bold text-red-900">{inc.incident_id}</span>
-                        <span className="text-[10px] text-red-600 ml-1.5 font-semibold">
-                          ({inc.severity}, {inc.patient_count}P)
+                  .map((inc) => {
+                    const isSubmerged = inc.status === 'UNREACHABLE_FLOODED';
+                    const isPredicted = inc.status === 'PREDICTED_FLOOD_SUBMERGENCE';
+                    const isTrapped = inc.status === 'AMBULANCE_TRAPPED';
+                    const badgeClass = isSubmerged ? 'bg-purple-100 text-purple-800 border-purple-200' :
+                                       isPredicted ? 'bg-rose-100 text-rose-800 border-rose-200' :
+                                       isTrapped ? 'bg-red-100 text-red-800 border-red-300 animate-pulse' :
+                                       'bg-white text-slate-700 border-slate-200';
+                    const badgeText = isSubmerged ? '🚤 SUBMERGED (BOAT EVAC)' :
+                                      isPredicted ? '⚠️ FLOOD CUTOFF' :
+                                      isTrapped ? '🆘 AMB TRAPPED' :
+                                      (inc.assigned_ambulance_id || 'DISPATCHING');
+                    return (
+                      <div
+                        key={inc.incident_id}
+                        onClick={() => setSelectedObject({ type: 'incident', data: inc })}
+                        className={`p-2 rounded-xl border flex items-center justify-between text-xs cursor-pointer transition-colors ${
+                          isSubmerged ? 'bg-purple-50/80 border-purple-200 hover:bg-purple-100/80' :
+                          isPredicted ? 'bg-rose-50/80 border-rose-200 hover:bg-rose-100/80' :
+                          'bg-red-50/70 border-red-100 hover:bg-red-100/70'
+                        }`}
+                      >
+                        <div>
+                          <span className={`font-bold ${isSubmerged ? 'text-purple-950' : 'text-red-900'}`}>{inc.incident_id}</span>
+                          <span className={`text-[10px] ml-1.5 font-semibold ${isSubmerged ? 'text-purple-700' : 'text-red-600'}`}>
+                            ({inc.severity}, {inc.patient_count}P)
+                          </span>
+                        </div>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeClass}`}>
+                          {badgeText}
                         </span>
                       </div>
-                      <span className="text-[10px] font-bold px-2 py-0.5 bg-white text-slate-700 rounded-full border border-slate-200">
-                        {inc.assigned_ambulance_id || 'DISPATCHING'}
-                      </span>
-                    </div>
-                  ))
+                    );
+                  })
               )}
             </div>
           </div>

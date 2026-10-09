@@ -480,31 +480,50 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
       const key = `amb-${amb.ambulance_id}`;
       currentMarkerKeys.add(key);
 
+      const isTrapped = amb.status === 'TRAPPED_IN_FLOOD';
+      const isRelocating = amb.status === 'RELOCATING_TO_SAFETY';
       const isResponding = amb.status.includes('EN_ROUTE') || amb.status === 'CALL_RECEIVED' || amb.status === 'AT_PATIENT';
-      const statusColor = isResponding ? 'bg-amber-500' : 'bg-blue-600';
+      
+      const statusColor = isTrapped ? 'bg-red-600' : isRelocating ? 'bg-amber-400' : isResponding ? 'bg-amber-500' : 'bg-blue-600';
       const patients = amb.patients_onboard || 0;
-      const label = amb.status === 'EN_ROUTE_TO_PATIENT' ? `${amb.ambulance_id} • SCENE (${amb.eta_minutes.toFixed(1)}m)` :
-                    amb.status === 'EN_ROUTE_TO_HOSPITAL' ? `${amb.ambulance_id} • HOSP (${amb.eta_minutes.toFixed(1)}m)` :
+      
+      const label = isTrapped ? `${amb.ambulance_id} • 🆘 TRAPPED IN FLOOD` :
+                    isRelocating ? `${amb.ambulance_id} • 🛡️ EVACUATING (${amb.eta_minutes.toFixed(1)}m)` :
+                    amb.status === 'EN_ROUTE_TO_PATIENT' ? `${amb.ambulance_id} • SCENE (${amb.eta_minutes.toFixed(1)}m)` :
+                    amb.status === 'EN_ROUTE_TO_HOSPITAL' ? (amb.diverted_hospital ? `${amb.ambulance_id} • 🚨 DIVERTED (${amb.eta_minutes.toFixed(1)}m)` : `${amb.ambulance_id} • HOSP (${amb.eta_minutes.toFixed(1)}m)`) :
                     amb.status === 'AT_PATIENT' ? `${amb.ambulance_id} • AT SCENE` :
                     amb.status === 'CALL_RECEIVED' ? `${amb.ambulance_id} • DISPATCHED` :
                     amb.ambulance_id;
 
+      const pillClass = isTrapped ? 'bg-red-700 ring-4 ring-red-400 shadow-2xl animate-pulse' :
+                        isRelocating ? 'bg-amber-600 ring-2 ring-amber-300 shadow-xl' :
+                        isResponding ? 'bg-blue-700 ring-2 ring-amber-400 shadow-amber-500/20' :
+                        'bg-slate-900 ring-1 ring-slate-700';
+
       const markerInnerHtml = `
         <div class="relative flex flex-col items-center group">
           <!-- Rich Hover Tooltip -->
-          <div class="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-950/95 text-white p-2.5 rounded-xl shadow-2xl border border-slate-700/80 text-xs w-60 pointer-events-none z-50 backdrop-blur-md">
+          <div class="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-950/95 text-white p-2.5 rounded-xl shadow-2xl border border-slate-700/80 text-xs w-64 pointer-events-none z-50 backdrop-blur-md">
             <div class="flex items-center justify-between font-bold border-b border-slate-800 pb-1.5 mb-1.5">
               <span class="text-blue-400 font-extrabold flex items-center gap-1">
                 <span>🚑</span>
                 <span>${amb.ambulance_id}</span>
                 <span class="text-[10px] text-slate-400 font-normal">(${amb.type})</span>
               </span>
-              <span class="text-[9px] px-1.5 py-0.5 rounded font-black ${isResponding ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-slate-800 text-slate-300'}">
+              <span class="text-[9px] px-1.5 py-0.5 rounded font-black ${isTrapped ? 'bg-red-600 text-white animate-bounce' : isResponding ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-slate-800 text-slate-300'}">
                 ${amb.status.replace(/_/g, ' ')}
               </span>
             </div>
             
             <div class="space-y-1 text-[11px] text-slate-300">
+              ${isTrapped ? `
+              <div class="p-1.5 bg-red-950/80 border border-red-500/60 rounded-lg text-red-200 font-bold text-[10px] leading-tight">
+                🆘 MAYDAY: Vehicle immobilised by severe floodwaters! Engine stalled. Urgent boat rescue needed.
+              </div>` : ''}
+              ${isRelocating ? `
+              <div class="p-1.5 bg-amber-950/80 border border-amber-500/60 rounded-lg text-amber-200 font-bold text-[10px] leading-tight">
+                🛡️ Proactive safety evacuation to high-ground staging base away from rising flood.
+              </div>` : ''}
               <div class="flex justify-between items-center py-0.5 border-b border-slate-800/60">
                 <span class="text-slate-400">Patients:</span>
                 <span class="font-bold ${patients > 0 ? 'text-amber-400' : 'text-emerald-400'}">
@@ -513,7 +532,7 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
               </div>
               <div class="flex justify-between items-center py-0.5 border-b border-slate-800/60">
                 <span class="text-slate-400">Speed:</span>
-                <span class="font-semibold text-slate-200">${amb.speed_kmh || 45} km/h</span>
+                <span class="font-semibold text-slate-200">${isTrapped ? '0' : amb.speed_kmh || 45} km/h</span>
               </div>
               <div class="flex justify-between items-center py-0.5 border-b border-slate-800/60">
                 <span class="text-slate-400">Assigned Staging:</span>
@@ -533,13 +552,13 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
           </div>
 
           <!-- Ambulance Badge Pill -->
-          <div class="flex items-center gap-1.5 ${isResponding ? 'bg-blue-700 ring-2 ring-amber-400 shadow-amber-500/20' : 'bg-slate-900 ring-1 ring-slate-700'} text-white px-2 py-1 rounded-lg shadow-xl text-xs font-bold transition-transform duration-200 group-hover:scale-105">
+          <div class="flex items-center gap-1.5 ${pillClass} text-white px-2 py-1 rounded-lg shadow-xl text-xs font-bold transition-transform duration-200 group-hover:scale-105">
             <span>🚑</span>
             <span>${label}</span>
             <span class="px-1.5 py-0.2 text-[10px] rounded font-black ${patients > 0 ? 'bg-amber-400 text-slate-950 shadow-xs' : 'bg-slate-800 text-slate-300 border border-slate-700'}">
               👥 ${patients}/2
             </span>
-            <span class="w-2 h-2 rounded-full ${statusColor} ${isResponding ? 'animate-ping' : ''}"></span>
+            <span class="w-2 h-2 rounded-full ${statusColor} ${isResponding || isTrapped ? 'animate-ping' : ''}"></span>
           </div>
           <div class="w-1.5 h-2 bg-slate-900"></div>
         </div>
@@ -548,7 +567,6 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
       if (!markersRef.current[key]) {
         const el = document.createElement('div');
         el.className = 'cursor-pointer select-none';
-        // Note: No CSS transition on transform! MapLibre directly updates transform for zoom/pan stability.
         el.id = `marker-${amb.ambulance_id}`;
         el.innerHTML = markerInnerHtml;
         el.onclick = (e) => {
@@ -560,7 +578,6 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
           .setLngLat(amb.current_location)
           .addTo(map);
       } else {
-        // Geographically reposition marker without any CSS transition interference
         markersRef.current[key].setLngLat(amb.current_location);
         const el = markersRef.current[key].getElement();
         el.innerHTML = markerInnerHtml;
@@ -577,23 +594,63 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
       const key = `inc-${inc.incident_id}`;
       currentMarkerKeys.add(key);
 
+      const isSubmerged = inc.status === 'UNREACHABLE_FLOODED';
+      const isPredicted = inc.status === 'PREDICTED_FLOOD_SUBMERGENCE';
+      const isTrappedAmb = inc.status === 'AMBULANCE_TRAPPED';
       const isCritical = inc.severity === 'CRITICAL';
-      const bgColor = isCritical ? 'bg-red-600' : inc.severity === 'HIGH' ? 'bg-orange-500' : 'bg-amber-500';
+
+      const bgColor = isSubmerged ? 'bg-purple-900 ring-2 ring-cyan-400 border border-cyan-300' :
+                      isPredicted ? 'bg-rose-900 ring-2 ring-amber-400 border border-amber-300' :
+                      isTrappedAmb ? 'bg-red-950 ring-2 ring-red-500 border border-red-400' :
+                      isCritical ? 'bg-red-600' :
+                      inc.severity === 'HIGH' ? 'bg-orange-500' : 'bg-amber-500';
+
+      const icon = isSubmerged ? '🚤' : isPredicted ? '⚠️' : isTrappedAmb ? '🆘' : '⚠️';
+      const badgeText = isSubmerged ? `${inc.incident_id} • SUBMERGED (BOAT RESCUE)` :
+                        isPredicted ? `${inc.incident_id} • FLOOD CUTOFF RISK` :
+                        isTrappedAmb ? `${inc.incident_id} • AMB TRAPPED` :
+                        inc.incident_id;
 
       const markerCoords = (inc as any).display_location || inc.coordinates;
+
+      const incidentInnerHtml = `
+        <div class="relative flex flex-col items-center group">
+          <!-- Rich Hover Tooltip -->
+          <div class="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-950/95 text-white p-2.5 rounded-xl shadow-2xl border border-slate-700/80 text-xs w-60 pointer-events-none z-50 backdrop-blur-md">
+            <div class="flex items-center justify-between font-bold border-b border-slate-800 pb-1.5 mb-1.5">
+              <span class="text-red-400 font-extrabold">${inc.incident_id}</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded font-black ${isSubmerged ? 'bg-purple-600 text-white' : 'bg-red-900 text-red-200'}">
+                ${inc.status.replace(/_/g, ' ')}
+              </span>
+            </div>
+            <div class="space-y-1 text-[11px] text-slate-300">
+              ${inc.unreachable_reason ? `
+              <div class="p-1.5 bg-red-950/80 border border-red-500/60 rounded-lg text-red-200 font-semibold text-[10px] leading-tight">
+                ${inc.unreachable_reason}
+              </div>` : ''}
+              <div class="flex justify-between items-center py-0.5">
+                <span class="text-slate-400">Severity:</span>
+                <span class="font-bold text-amber-300">${inc.severity} (${inc.patient_count} Patients)</span>
+              </div>
+              <div class="flex justify-between items-center py-0.5">
+                <span class="text-slate-400">Assigned Unit:</span>
+                <span class="font-bold text-sky-300">${inc.assigned_ambulance_id || (isSubmerged ? 'None (Ground Aborted)' : 'Dispatching...')}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5 ${bgColor} text-white px-2.5 py-1 rounded-full shadow-lg font-bold text-xs ${isCritical || isSubmerged ? 'pulse-critical' : ''}">
+            <span>${icon}</span>
+            <span>${badgeText}</span>
+            <span class="bg-black/25 text-[10px] px-1.5 py-0.2 rounded-full">${inc.patient_count}P</span>
+          </div>
+        </div>
+      `;
 
       if (!markersRef.current[key]) {
         const el = document.createElement('div');
         el.className = 'cursor-pointer select-none';
-        el.innerHTML = `
-          <div class="relative flex flex-col items-center">
-            <div class="flex items-center gap-1.5 ${bgColor} text-white px-2.5 py-1 rounded-full shadow-lg font-bold text-xs ${isCritical ? 'pulse-critical' : ''}">
-              <span>⚠️</span>
-              <span>${inc.incident_id}</span>
-              <span class="bg-black/25 text-[10px] px-1.5 py-0.2 rounded-full">${inc.patient_count}P</span>
-            </div>
-          </div>
-        `;
+        el.innerHTML = incidentInnerHtml;
         el.onclick = (e) => {
           e.stopPropagation();
           onSelectObjectRef.current?.('incident', inc);
@@ -605,6 +662,7 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
       } else {
         markersRef.current[key].setLngLat(markerCoords);
         const el = markersRef.current[key].getElement();
+        el.innerHTML = incidentInnerHtml;
         el.onclick = (e) => {
           e.stopPropagation();
           onSelectObjectRef.current?.('incident', inc);

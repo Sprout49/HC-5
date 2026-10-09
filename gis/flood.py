@@ -12,7 +12,7 @@ import json
 from collections import deque
 from typing import Dict, Any, List, Tuple, Optional
 import numpy as np
-from shapely.geometry import Polygon, MultiPolygon, LineString, box
+from shapely.geometry import Polygon, MultiPolygon, LineString, Point, box
 from shapely.ops import unary_union
 
 class UrbanFloodEngine:
@@ -201,3 +201,82 @@ class UrbanFloodEngine:
             reason = f"Minor surface water ({depth:.2f}m); road passable with caution."
 
         return status, depth, flooded_pct, reason
+
+    def is_location_flooded(
+        self,
+        lon: float,
+        lat: float,
+        flood_poly: MultiPolygon,
+        water_rise_m: float
+    ) -> Tuple[bool, float, float]:
+        """
+        Evaluates whether a point coordinate is flooded, its local depth, and distance to flood edge.
+        Returns: (is_flooded, depth_m, distance_to_flood_m)
+        """
+        pt = Point(lon, lat)
+        dist_to_flood_m = 9999.0
+        is_inside_poly = False
+
+        if flood_poly and not flood_poly.is_empty:
+            is_inside_poly = flood_poly.contains(pt) or flood_poly.intersects(pt)
+            try:
+                dist_to_flood_m = float(flood_poly.distance(pt)) * 111320.0
+            except Exception:
+                dist_to_flood_m = 0.0 if is_inside_poly else 9999.0
+
+        # Elevation and hydraulic depth lookup
+        depth_m = 0.0
+        if hasattr(self, 'elev_matrix') and self.elev_matrix.size > 0:
+            r = int(np.clip(int((self.lats[0] - lat) / (self.lats[0] - self.lats[-1]) * (self.n_lat - 1)), 0, self.n_lat - 1))
+            c = int(np.clip(int((lon - self.lons[0]) / (self.lons[-1] - self.lons[0]) * (self.n_lon - 1)), 0, self.n_lon - 1))
+            elev = float(self.elev_matrix[r, c])
+            water_surface = 548.5 + float(water_rise_m)
+            depth_m = max(0.0, round(water_surface - elev, 2))
+
+        # Flooded condition: inside flood polygon OR local water depth >= 0.35m within flood basin OR immediate perimeter
+        is_flooded = is_inside_poly or (depth_m >= 0.35 and dist_to_flood_m <= 120.0) or (dist_to_flood_m <= 25.0)
+        return is_flooded, depth_m, round(dist_to_flood_m, 1)
+
+    def predict_submergence(
+        self,
+        lon: float,
+        lat: float,
+        current_water_rise_m: float,
+        sim_time_min: float,
+        eta_min: float,
+        scenario_name: str
+    ) -> Tuple[bool, float, float]:
+        """
+        Predicts if a point coordinate will be submerged by advancing floodwaters upon vehicle ETA.
+        Returns: (will_submerge, predicted_depth_m, dist_to_flood_m)
+        """
+        future_time = sim_time_min + max(1.0, eta_min)
+        if scenario_name == "NORMAL":
+            future_water = 0.2
+        elif scenario_name == "MODERATE FLOOD":
+            future_water = round(0.2 + (future_time / 50.0) * 3.0, 2)
+        else:
+            future_water = round(0.4 + (future_time / 40.0) * 4.2, 2)
+
+        # Check future depth at location
+        predicted_depth = 0.0
+        if hasattr(self, 'elev_matrix') and self.elev_matrix.size > 0:
+            r = int(np.clip(int((self.lats[0] - lat) / (self.lats[0] - self.lats[-1]) * (self.n_lat - 1)), 0, self.n_lat - 1))
+            c = int(np.clip(int((lon - self.lons[0]) / (self.lons[-1] - self.lons[0]) * (self.n_lon - 1)), 0, self.n_lon - 1))
+            elev = float(self.elev_matrix[r, c])
+            future_surface = 548.5 + float(future_water)
+            predicted_depth = max(0.0, round(future_surface - elev, 2))
+
+        # Check distance to current flood surface
+        pt = Point(lon, lat)
+        curr_poly, _, _ = self.compute_flood_surface(current_water_rise_m)
+        dist_to_flood_m = 9999.0
+        if curr_poly and not curr_poly.is_empty:
+            if curr_poly.contains(pt) or curr_poly.intersects(pt):
+                dist_to_flood_m = 0.0
+            else:
+                dist_to_flood_m = float(curr_poly.distance(pt)) * 111320.0
+
+        # Submergence predicted if future depth >= 0.25m or within immediate flood perimeter with rising water
+        will_submerge = (predicted_depth >= 0.25) or (dist_to_flood_m <= 65.0 and future_water >= current_water_rise_m) or (dist_to_flood_m <= 25.0)
+        return will_submerge, predicted_depth, round(dist_to_flood_m, 1)

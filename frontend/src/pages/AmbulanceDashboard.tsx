@@ -29,11 +29,11 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = ({ activeTa
     (i) => i.incident_id === currentAmbulance?.current_incident_id
   );
 
-  // Auto-select unit with active call or route if current unit is idle
+  // Auto-select unit with active call, route, or distress if current unit is idle
   useEffect(() => {
     if (!state?.ambulances) return;
     const activeUnit = state.ambulances.find(
-      (a) => a.status === 'CALL_RECEIVED' || a.status.includes('EN_ROUTE') || a.status === 'AT_PATIENT'
+      (a) => a.status === 'CALL_RECEIVED' || a.status.includes('EN_ROUTE') || a.status === 'AT_PATIENT' || a.status === 'TRAPPED_IN_FLOOD' || a.status === 'RELOCATING_TO_SAFETY'
     );
     if (activeUnit && (!currentAmbulance || currentAmbulance.status === 'AVAILABLE')) {
       setActiveAmbulanceId(activeUnit.ambulance_id);
@@ -202,6 +202,96 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = ({ activeTa
                 <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
                   Ambulance is staged and ready in Zone {currentAmbulance?.assigned_zone}. The central AI dispatch engine will assign calls in real time.
                 </p>
+              </div>
+            )}
+
+            {/* STATE: TRAPPED IN FLOODWATERS (Scenario 2B) */}
+            {currentAmbulance?.status === 'TRAPPED_IN_FLOOD' && (
+              <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
+                <div className="p-4 bg-red-100 rounded-2xl border-2 border-red-500 text-center space-y-2">
+                  <div className="w-12 h-12 mx-auto bg-red-600 text-white rounded-2xl flex items-center justify-center text-2xl animate-bounce shadow-lg">
+                    🆘
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-red-900 tracking-tight">
+                      VEHICLE TRAPPED IN FLOODWATERS
+                    </h3>
+                    <p className="text-xs text-red-700 font-semibold mt-1">
+                      CRITICAL MAYDAY: Water depth exceeded clearance limit. Engine stalled / road submerged.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-red-50 rounded-xl border border-red-200 text-xs space-y-2">
+                  <div className="flex justify-between items-center text-red-900 font-bold">
+                    <span>Engine & Navigation:</span>
+                    <span className="text-red-700 uppercase">IMMOBILISED (STALLED)</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-600">
+                    <span>Patients Onboard:</span>
+                    <span className="font-bold text-slate-900">👥 {currentAmbulance.patients_onboard || 0} / 2</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-600">
+                    <span>GPS Coordinates:</span>
+                    <span className="font-mono text-[11px] text-slate-800">
+                      [{currentAmbulance.current_location[1].toFixed(4)}, {currentAmbulance.current_location[0].toFixed(4)}]
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-white rounded-xl border border-red-300 text-xs text-red-800 flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
+                  <span className="leading-snug">
+                    Mayday transmitted to Central Dispatch. Ground navigation halted. Standby for SDRF / NDRF watercraft rescue.
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* STATE: RELOCATING TO SAFETY (Scenario 4) */}
+            {currentAmbulance?.status === 'RELOCATING_TO_SAFETY' && (
+              <div className="space-y-3 animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-amber-600" />
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-amber-600">Proactive Fleet Safety</span>
+                      <h4 className="font-black text-slate-900 text-sm">Autonomous Flood Relocation</h4>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xl font-black text-amber-600">
+                      {currentAmbulance.eta_minutes.toFixed(1)}m
+                    </span>
+                    <span className="text-[10px] block text-slate-400 font-bold">
+                      {currentAmbulance.active_route?.distance_km} km
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 space-y-1.5 text-xs">
+                  <div className="text-[11px] text-amber-950 font-semibold flex items-center gap-1.5">
+                    <span>🛡️</span>
+                    <span>Encroaching floodwaters detected near staging post. Autonomously relocating to safe high-ground base before cutoff.</span>
+                  </div>
+                  <div className="text-slate-600 text-[11px] flex justify-between pt-1 border-t border-amber-200/60">
+                    <span>Target Safe Staging:</span>
+                    <strong className="text-amber-900">{currentAmbulance.safe_staging_name || 'High Ground Safe Core'}</strong>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
+                    <span>Relocation Progress</span>
+                    <span>{((currentAmbulance.route_progress || 0) * 100).toFixed(0)}%</span>
+                  </div>
+                  <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                    <div
+                      className="h-full bg-amber-500 rounded-full transition-all duration-300"
+                      style={{ width: `${((currentAmbulance.route_progress || 0) * 100).toFixed(0)}%` }}
+                    />
+                  </div>
+                </div>
               </div>
             )}
 
@@ -436,6 +526,19 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = ({ activeTa
                     <span className="text-slate-500 font-normal">Direct Emergency Admission</span>
                   </div>
                 </div>
+
+                {/* Scenario 5: Hospital Divert Alert Banner */}
+                {currentAmbulance.diverted_hospital && (
+                  <div className="p-3 bg-amber-50 rounded-2xl border border-amber-300 text-xs text-amber-950 flex items-start gap-2 shadow-xs animate-pulse">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="block text-amber-900 font-black">🚨 HOSPITAL DIVERT ACTIVE</strong>
+                      <span className="text-[11px] text-amber-800 leading-snug">
+                        Original facility was surrounded by rising floodwaters. Central Dispatch dynamically rerouted your vehicle to {currentAmbulance.target_hospital_name}.
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Progress bar */}
                 <div className="space-y-1">

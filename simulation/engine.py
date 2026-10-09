@@ -238,30 +238,257 @@ class SimulationEngine:
                 elif status in ["RESTRICTED", "HIGH_RISK"]:
                     self.log_event(f"Road {road['name']} ({road['road_id']}) {status}: Water depth {depth:.2f}m.", "info")
 
-        # 3. Check for Live Ambulance Rerouting if active route traverses blocked roads
+        # High-ground flood-safe staging bases for proactive vehicle self-preservation
+        SAFE_STAGING_BASES = [
+            {"name": "Sassoon Trauma Core Base", "coords": [73.8744, 18.5284], "zone": "Z3"},
+            {"name": "Kothrud Stand Base", "coords": [73.8120, 18.5070], "zone": "Z8"},
+            {"name": "Camp MG Road Base", "coords": [73.8760, 18.5150], "zone": "Z6"},
+            {"name": "Shivajinagar North Base", "coords": [73.8512, 18.5312], "zone": "Z1"},
+        ]
+
+        # 3A. Check for Ambulances Trapped in Floodwaters (Scenario 2B)
         for amb in self.ambulances:
-            if amb["status"] in ["EN_ROUTE_TO_PATIENT", "EN_ROUTE_TO_HOSPITAL"] and amb.get("active_route"):
-                route = amb["active_route"]
-                road_ids_in_route = route.get("road_ids", [])
-                
-                # Check intersection with newly blocked roads
-                intersects_blocked = any(rid in blocked_roads for rid in road_ids_in_route)
-                if intersects_blocked and amb.get("target_location"):
-                    # Recalculate route from ambulance's current location!
-                    new_route = self.routing_graph.calculate_route(amb["current_location"], amb["target_location"])
-                    if new_route:
-                        amb["previous_route"] = copy.deepcopy(amb["active_route"])
-                        amb["active_route"] = new_route
+            if amb.get("status") == "TRAPPED_IN_FLOOD":
+                continue
+
+            curr_pos = amb["current_location"]
+            is_amb_flooded, amb_depth, _ = self.flood_engine.is_location_flooded(
+                curr_pos[0], curr_pos[1], self.flood_poly, self.water_rise_m
+            )
+            _, _, amb_road_id, _ = self.routing_graph.snap_to_road(curr_pos[0], curr_pos[1])
+            amb_road = self.routing_graph.roads_by_id.get(amb_road_id)
+            road_depth = amb_road.get("flood_depth", 0.0) if amb_road else 0.0
+            eff_depth = max(amb_depth, road_depth)
+
+            # Trapped threshold: deep water or flooded road with no exit path
+            if is_amb_flooded or eff_depth >= 0.40 or (amb_road and amb_road.get("status") == "BLOCKED" and eff_depth >= 0.30):
+                can_escape = False
+                for base in SAFE_STAGING_BASES:
+                    test_escape = self.routing_graph.calculate_route(curr_pos, base["coords"])
+                    if test_escape:
+                        can_escape = True
+                        break
+
+                if not can_escape:
+                    amb["status"] = "TRAPPED_IN_FLOOD"
+                    amb["is_trapped"] = True
+                    amb["speed_kmh"] = 0.0
+                    amb["eta_minutes"] = 0.0
+                    amb["active_route"] = None
+                    pts = amb.get("patients_onboard", 0)
+                    pts_txt = f" with {pts} patient(s) onboard" if pts > 0 else ""
+                    self.log_event(
+                        f"🆘 CRITICAL MAYDAY: Ambulance {amb['ambulance_id']} is TRAPPED IN FLOODWATERS{pts_txt} at [{curr_pos[1]:.4f}, {curr_pos[0]:.4f}] (water depth {eff_depth:.2f}m)! Vehicle immobilised. Immediate rescue required!",
+                        "critical"
+                    )
+                    if amb.get("current_incident_id"):
+                        tgt_inc = next((i for i in self.incidents if i["incident_id"] == amb["current_incident_id"]), None)
+                        if tgt_inc and tgt_inc.get("status") != "RESOLVED":
+                            tgt_inc["status"] = "AMBULANCE_TRAPPED"
+                            tgt_inc["unreachable_reason"] = f"Assigned ambulance {amb['ambulance_id']} became trapped in rising floodwaters."
+
+        # 3B. Dynamic Rerouting, Incident Cutoff Checks, Hospital Divert & Proactive Evacuation
+        for amb in self.ambulances:
+            if amb.get("status") == "TRAPPED_IN_FLOOD":
+                continue
+
+            # --- CASE 1: EN_ROUTE_TO_PATIENT ---
+            if amb["status"] == "EN_ROUTE_TO_PATIENT":
+                inc_id = amb.get("current_incident_id")
+                tgt_inc = next((i for i in self.incidents if i["incident_id"] == inc_id), None)
+                inc_coords = tgt_inc.get("routing_location", tgt_inc["coordinates"]) if tgt_inc else amb.get("target_location")
+
+                if inc_coords:
+                    # Scenario 1 check: Is incident scene already submerged in flood?
+                    inc_flooded, inc_depth, _ = self.flood_engine.is_location_flooded(
+                        inc_coords[0], inc_coords[1], self.flood_poly, self.water_rise_m
+                    )
+                    if inc_flooded or inc_depth >= 0.35:
+                        if tgt_inc:
+                            tgt_inc["status"] = "UNREACHABLE_FLOODED"
+                            tgt_inc["is_unreachable"] = True
+                            tgt_inc["assigned_ambulance_id"] = None
+                            tgt_inc["unreachable_reason"] = f"Incident location submerged under {inc_depth:.2f}m floodwaters."
+                        amb["status"] = "AVAILABLE"
+                        amb["target_location"] = None
+                        amb["current_incident_id"] = None
+                        amb["active_route"] = None
+                        amb["previous_route"] = None
                         amb["route_progress"] = 0.0
-                        amb["eta_minutes"] = new_route["duration_min"]
-                        self.log_event(f"⚡ LIVE REROUTE: {amb['ambulance_id']} redirected via safe route ({new_route['distance_km']} km, ETA {new_route['duration_min']}m).", "alert")
+                        amb["eta_minutes"] = 0.0
+                        self.log_event(
+                            f"⛔ MISSION ABORTED: Incident {inc_id} submerged in floodwaters ({inc_depth:.2f}m). {amb['ambulance_id']} stopped ground approach. Escalated to Admin for boat rescue.",
+                            "critical"
+                        )
+                        continue
+
+                    # Scenario 2A check: Flood submergence prediction before ambulance arrival
+                    will_submerge, pred_depth, dist_to_flood_m = self.flood_engine.predict_submergence(
+                        inc_coords[0], inc_coords[1], self.water_rise_m, self.sim_time_minutes, amb.get("eta_minutes", 3.0), self.scenario_name
+                    )
+                    if will_submerge and amb.get("eta_minutes", 0) > 1.2:
+                        if tgt_inc:
+                            tgt_inc["status"] = "PREDICTED_FLOOD_SUBMERGENCE"
+                            tgt_inc["is_unreachable"] = True
+                            tgt_inc["assigned_ambulance_id"] = None
+                            tgt_inc["unreachable_reason"] = f"Predicted flood inundation ({pred_depth:.2f}m) before ambulance arrival."
+                        amb["status"] = "AVAILABLE"
+                        amb["target_location"] = None
+                        amb["current_incident_id"] = None
+                        amb["active_route"] = None
+                        amb["previous_route"] = None
+                        amb["route_progress"] = 0.0
+                        amb["eta_minutes"] = 0.0
+                        self.log_event(
+                            f"⚠️ FLOOD PREDICTION ALERT: Incident {inc_id} is in rapid inundation path ({dist_to_flood_m:.0f}m from flood edge, {pred_depth:.2f}m depth predicted). Predicted to submerge before arrival! {amb['ambulance_id']} aborted ground approach. Reported to Admin for boat evacuation.",
+                            "critical"
+                        )
+                        continue
+
+                # Route blocked check (Scenario 1 recalculate or abort)
+                if amb.get("active_route"):
+                    route_road_ids = amb["active_route"].get("road_ids", [])
+                    intersects_blocked = any(rid in blocked_roads for rid in route_road_ids)
+                    if intersects_blocked and amb.get("target_location"):
+                        new_route = self.routing_graph.calculate_route(amb["current_location"], amb["target_location"])
+                        if new_route:
+                            amb["previous_route"] = copy.deepcopy(amb["active_route"])
+                            amb["active_route"] = new_route
+                            amb["route_progress"] = 0.0
+                            amb["eta_minutes"] = new_route["duration_min"]
+                            self.log_event(
+                                f"⚡ LIVE REROUTE: {amb['ambulance_id']} redirected via safe route ({new_route['distance_km']} km, ETA {new_route['duration_min']}m).",
+                                "alert"
+                            )
+                        else:
+                            # Scenario 1 core: NO ROUTE LEFT! Stop working for incident and report to admin
+                            if tgt_inc:
+                                tgt_inc["status"] = "UNREACHABLE_FLOODED"
+                                tgt_inc["is_unreachable"] = True
+                                tgt_inc["assigned_ambulance_id"] = None
+                                tgt_inc["unreachable_reason"] = "All access corridors to incident are inundated by floodwaters."
+                            amb["status"] = "AVAILABLE"
+                            amb["target_location"] = None
+                            amb["current_incident_id"] = None
+                            amb["active_route"] = None
+                            amb["previous_route"] = None
+                            amb["route_progress"] = 0.0
+                            amb["eta_minutes"] = 0.0
+                            self.log_event(
+                                f"⛔ MISSION ABORTED: {amb['ambulance_id']} has NO viable route left to reach {inc_id} due to flood cutoff! Ground response halted. Reported to Admin for boat/air rescue.",
+                                "critical"
+                            )
+                            continue
+
+            # --- CASE 2: EN_ROUTE_TO_HOSPITAL (Scenario 5) ---
+            elif amb["status"] == "EN_ROUTE_TO_HOSPITAL":
+                target_hosp_id = amb.get("target_hospital_id")
+                target_hosp = next((h for h in self.hospitals if h["hospital_id"] == target_hosp_id), None)
+                hosp_coords = target_hosp.get("coordinates", [73.8744, 18.5284]) if target_hosp else [73.8744, 18.5284]
+
+                hosp_flooded, hosp_depth, hosp_dist = self.flood_engine.is_location_flooded(
+                    hosp_coords[0], hosp_coords[1], self.flood_poly, self.water_rise_m
+                )
+                route_road_ids = amb.get("active_route", {}).get("road_ids", [])
+                intersects_blocked = any(rid in blocked_roads for rid in route_road_ids)
+
+                is_hosp_compromised = hosp_flooded or hosp_depth >= 0.30 or hosp_dist <= 50.0
+
+                if is_hosp_compromised or intersects_blocked:
+                    # Check if SAME hospital is still reachable via safe road detour ONLY IF hospital itself is not compromised
+                    same_hosp_route = None
+                    if not is_hosp_compromised:
+                        same_hosp_route = self.routing_graph.calculate_route(
+                            amb["current_location"], target_hosp.get("routing_location", hosp_coords)
+                        )
+                    if same_hosp_route:
+                        amb["previous_route"] = copy.deepcopy(amb["active_route"])
+                        amb["active_route"] = same_hosp_route
+                        amb["route_progress"] = 0.0
+                        amb["eta_minutes"] = same_hosp_route["duration_min"]
+                        self.log_event(
+                            f"⚡ LIVE REROUTE: {amb['ambulance_id']} detour around flood to {target_hosp['name']}.",
+                            "alert"
+                        )
                     else:
-                        amb["status"] = "BLOCKED_NO_ROUTE"
-                        self.log_event(f"CRITICAL: {amb['ambulance_id']} has no viable route to destination due to floodwaters!", "critical")
+                        # Target hospital is surrounded by flood or cut off! (Scenario 5)
+                        old_hosp_name = target_hosp["name"] if target_hosp else "Target Hospital"
+                        candidate_hospitals = []
+                        for h in self.hospitals:
+                            if h["hospital_id"] == target_hosp_id:
+                                continue
+                            c_flooded, c_depth, _ = self.flood_engine.is_location_flooded(
+                                h["coordinates"][0], h["coordinates"][1], self.flood_poly, self.water_rise_m
+                            )
+                            if not c_flooded and c_depth < 0.25:
+                                candidate_hospitals.append(h)
+                        if not candidate_hospitals:
+                            candidate_hospitals = [
+                                h for h in self.hospitals if h["hospital_id"] != target_hosp_id
+                            ]
+                        inc_dummy = {"severity": "CRITICAL" if amb.get("patients_onboard", 1) > 1 else "HIGH", "patient_count": amb.get("patients_onboard", 1)}
+                        best_alt_hosp, alt_route, explanation = select_best_hospital(
+                            inc_dummy, candidate_hospitals, amb["current_location"], self.routing_graph
+                        )
+                        if best_alt_hosp and alt_route:
+                            amb["target_hospital_id"] = best_alt_hosp["hospital_id"]
+                            amb["target_hospital_name"] = best_alt_hosp["name"]
+                            amb["previous_route"] = copy.deepcopy(amb.get("active_route"))
+                            amb["active_route"] = alt_route
+                            amb["target_location"] = best_alt_hosp.get("routing_location", best_alt_hosp["coordinates"])
+                            amb["route_progress"] = 0.0
+                            amb["eta_minutes"] = alt_route["duration_min"]
+                            amb["diverted_hospital"] = True
+                            self.log_event(
+                                f"🚨 DYNAMIC HOSPITAL DIVERT: {old_hosp_name} is surrounded by floodwaters and inaccessible! {amb['ambulance_id']} dynamically diverted from current position to {best_alt_hosp['name']} (ETA {alt_route['duration_min']:.1f}m, {alt_route['distance_km']} km safe corridor). Beds verified.",
+                                "alert"
+                            )
+                        else:
+                            amb["status"] = "BLOCKED_NO_HOSPITAL"
+                            self.log_event(
+                                f"CRITICAL MEDICAL GAP: {amb['ambulance_id']} with patient onboard cannot reach ANY regional hospital due to flood inundation! Escalated to Admin for field camp triage or heli-evac.",
+                                "critical"
+                            )
+
+            # --- CASE 3: IDLE AMBULANCE PROACTIVE RELOCATION (Scenario 4) ---
+            elif amb["status"] in ["AVAILABLE", "IDLE"] and not amb.get("current_incident_id"):
+                curr_pos = amb["current_location"]
+                _, depth, dist_to_flood_m = self.flood_engine.is_location_flooded(
+                    curr_pos[0], curr_pos[1], self.flood_poly, self.water_rise_m
+                )
+                if dist_to_flood_m < 200.0 or depth > 0.05:
+                    # Encroaching floodwaters near idle ambulance!
+                    best_base = None
+                    best_route = None
+                    for base in SAFE_STAGING_BASES:
+                        b_flooded, _, b_dist = self.flood_engine.is_location_flooded(
+                            base["coords"][0], base["coords"][1], self.flood_poly, self.water_rise_m
+                        )
+                        if not b_flooded and b_dist > 300.0:
+                            r = self.routing_graph.calculate_route(curr_pos, base["coords"])
+                            if r and (best_route is None or r["duration_min"] < best_route["duration_min"]):
+                                best_route = r
+                                best_base = base
+                    if best_base and best_route:
+                        amb["status"] = "RELOCATING_TO_SAFETY"
+                        amb["target_location"] = best_base["coords"]
+                        amb["safe_staging_name"] = best_base["name"]
+                        amb["assigned_zone"] = best_base["zone"]
+                        amb["active_route"] = best_route
+                        amb["previous_route"] = None
+                        amb["route_progress"] = 0.0
+                        amb["eta_minutes"] = best_route["duration_min"]
+                        self.log_event(
+                            f"🛡️ PROACTIVE FLEET RELOCATION: Encroaching floodwaters ({dist_to_flood_m:.0f}m away) detected near idle {amb['ambulance_id']}. Auto-relocating to flood-safe staging at {best_base['name']} (ETA {best_route['duration_min']:.1f}m).",
+                            "alert"
+                        )
 
         # 4. Advance Ambulances Along Routes
         for amb in self.ambulances:
-            if amb["status"] in ["EN_ROUTE_TO_PATIENT", "EN_ROUTE_TO_HOSPITAL"] and amb.get("active_route"):
+            if amb.get("status") == "TRAPPED_IN_FLOOD":
+                continue
+
+            if amb["status"] in ["EN_ROUTE_TO_PATIENT", "EN_ROUTE_TO_HOSPITAL", "RELOCATING_TO_SAFETY"] and amb.get("active_route"):
                 route_coords = amb["active_route"]["route_coordinates"]
                 total_duration = max(0.5, amb["active_route"]["duration_min"])
                 
@@ -287,7 +514,13 @@ class SimulationEngine:
 
                 # Check arrival
                 if amb["route_progress"] >= 1.0:
-                    if amb["status"] == "EN_ROUTE_TO_PATIENT":
+                    if amb["status"] == "RELOCATING_TO_SAFETY":
+                        safe_name = amb.pop("safe_staging_name", "Safe Staging Base")
+                        amb["status"] = "AVAILABLE"
+                        amb["active_route"] = None
+                        amb["target_location"] = None
+                        self.log_event(f"✅ {amb['ambulance_id']} safely reached high-ground staging at {safe_name}. Ready for emergency calls.", "info")
+                    elif amb["status"] == "EN_ROUTE_TO_PATIENT":
                         amb["status"] = "AT_PATIENT"
                         amb["route_progress"] = 1.0
                         self.log_event(f"📍 {amb['ambulance_id']} arrived at patient scene. Onsite triage in progress; awaiting patient pickup confirmation.", "info")
@@ -389,6 +622,35 @@ class SimulationEngine:
         # Snap routing location to nearest physical road segment while preserving original display location
         snapped_pt, nearest_node, road_id, snap_dist = self.routing_graph.snap_to_road(lon, lat)
 
+        # Scenario 1 & 2 Check: Is the reported location already submerged in floodwaters?
+        is_submerged, depth, dist_to_flood_m = self.flood_engine.is_location_flooded(
+            lon, lat, self.flood_poly, self.water_rise_m
+        )
+        if is_submerged or depth >= 0.35:
+            incident = {
+                "incident_id": inc_id,
+                "coordinates": [round(lon, 5), round(lat, 5)],
+                "display_location": [round(lon, 5), round(lat, 5)],
+                "routing_location": snapped_pt,
+                "snap_distance_m": round(snap_dist, 1),
+                "snapped_road_id": road_id,
+                "zone_id": target_zone_id,
+                "severity": severity,
+                "patient_count": patient_count,
+                "status": "UNREACHABLE_FLOODED",
+                "is_unreachable": True,
+                "unreachable_reason": f"Incident site is submerged in floodwaters ({depth:.2f}m depth). Road access severed.",
+                "created_time": self.sim_time_minutes,
+                "assigned_ambulance_id": None,
+                "target_hospital_id": None
+            }
+            self.incidents.append(incident)
+            self.log_event(
+                f"🚨 CRITICAL RESCUE DISPATCH: Emergency {inc_id} reported in Zone {target_zone_id} is SUBMERGED in floodwaters ({depth:.2f}m depth)! Ground ambulances cannot reach this submerged area. Escalating to Admin for NDRF / SDRF boat rescue. Ground response aborted.",
+                "critical"
+            )
+            return incident
+
         incident = {
             "incident_id": inc_id,
             "coordinates": [round(lon, 5), round(lat, 5)],
@@ -413,6 +675,21 @@ class SimulationEngine:
 
     def auto_dispatch_incident(self, incident: Dict[str, Any]):
         """Dispatches best ambulance using multi-criteria optimization."""
+        if incident.get("status") in ["UNREACHABLE_FLOODED", "RESOLVED"]:
+            return
+
+        inc_coords = incident.get("routing_location", incident["coordinates"])
+        is_submerged, depth, _ = self.flood_engine.is_location_flooded(
+            inc_coords[0], inc_coords[1], self.flood_poly, self.water_rise_m
+        )
+        if is_submerged or depth >= 0.35:
+            incident["status"] = "UNREACHABLE_FLOODED"
+            incident["is_unreachable"] = True
+            incident["assigned_ambulance_id"] = None
+            incident["unreachable_reason"] = f"Incident location submerged under {depth:.2f}m floodwaters."
+            self.log_event(f"🚨 CRITICAL RESCUE ALERT: Emergency {incident['incident_id']} is submerged in floodwaters! Ground dispatch aborted. Escalated to Admin.", "critical")
+            return
+
         best_amb, route, explanation = select_best_ambulance(incident, self.ambulances, self.routing_graph)
         if best_amb and route:
             best_amb["status"] = "CALL_RECEIVED"
@@ -428,7 +705,12 @@ class SimulationEngine:
 
             self.log_event(f"Dispatch Engine assigned {best_amb['ambulance_id']} to {incident['incident_id']}. {explanation}", "info")
         else:
-            self.log_event(f"DISPATCH ALERT: No accessible ambulance for {incident['incident_id']}! Reason: {explanation}", "warning")
+            # Scenario 1 core: no route left, report to admin and stop trying to dispatch ground ambulance
+            incident["status"] = "UNREACHABLE_FLOODED"
+            incident["is_unreachable"] = True
+            incident["assigned_ambulance_id"] = None
+            incident["unreachable_reason"] = f"All approach routes cut off by floodwaters: {explanation}"
+            self.log_event(f"🚨 DISPATCH ALERT: No accessible road route left for {incident['incident_id']}! Ground dispatch aborted. Reported to Admin for SDRF boat extraction.", "critical")
 
     def ambulance_accept_call(self, ambulance_id: str) -> bool:
         """Ambulance operator accepts call in Ambulance Dashboard."""
@@ -453,6 +735,25 @@ class SimulationEngine:
 
         if not target_amb:
             return None
+
+        # Scenario 2B: Check if ambulance is trapped in floodwaters
+        if target_amb.get("status") == "TRAPPED_IN_FLOOD":
+            self.log_event(f"⚠️ {ambulance_id} is TRAPPED IN FLOODWATERS. Vehicle immobilised; cannot transport patient. Boat evacuation required.", "warning")
+            return None
+
+        curr_pos = target_amb["current_location"]
+        is_amb_f, amb_d, _ = self.flood_engine.is_location_flooded(curr_pos[0], curr_pos[1], self.flood_poly, self.water_rise_m)
+        if is_amb_f or amb_d >= 0.35:
+            # Check exit routes
+            can_exit = any(self.routing_graph.calculate_route(curr_pos, h.get("routing_location", h["coordinates"])) for h in self.hospitals)
+            if not can_exit:
+                target_amb["status"] = "TRAPPED_IN_FLOOD"
+                target_amb["is_trapped"] = True
+                target_amb["speed_kmh"] = 0.0
+                target_amb["eta_minutes"] = 0.0
+                target_amb["patients_onboard"] = 1
+                self.log_event(f"🆘 CRITICAL MAYDAY: {ambulance_id} picked up patient but is TRAPPED IN FLOODWATERS at scene [{curr_pos[1]:.4f}, {curr_pos[0]:.4f}]! Vehicle immobilised. Urgent rescue boat needed!", "critical")
+                return None
 
         # Update status and patient count
         target_amb["status"] = "PATIENT_PICKED_UP"
@@ -486,6 +787,7 @@ class SimulationEngine:
                 "explanation": explanation
             }
         else:
+            target_amb["status"] = "BLOCKED_NO_HOSPITAL"
             self.log_event(f"CRITICAL GAP: No eligible hospital available for {ambulance_id}! {explanation}", "critical")
             return None
 
