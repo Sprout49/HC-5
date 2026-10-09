@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSimulation } from '../context/SimulationContext';
 import { CityMap3D } from '../components/map/CityMap3D';
 import { DetailDrawer } from '../components/admin/DetailDrawer';
@@ -6,7 +6,7 @@ import { FleetManagementModal } from '../components/admin/FleetManagementModal';
 import { useAuth } from '../context/AuthContext';
 import { CreateEmergencyModal } from '../components/admin/CreateEmergencyModal';
 import { AssumptionsModal } from '../components/admin/AssumptionsModal';
-import type { SeverityLevel } from '../types/simulation';
+import type { SeverityLevel, SimEvent } from '../types/simulation';
 import {
   Play,
   Pause,
@@ -21,6 +21,8 @@ import {
   Shield,
   Ambulance as AmbulanceIcon,
   LogOut,
+  AlertTriangle,
+  X,
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -47,7 +49,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
   const [selectedObject, setSelectedObject] = useState<{ type: any; data: any } | null>(null);
   const [showAssumptions, setShowAssumptions] = useState(false);
   const [showFleetModal, setShowFleetModal] = useState(false);
+  const [floodRescueAlert, setFloodRescueAlert] = useState<SimEvent | null>(null);
+  const lastFloodAlertKey = useRef<string | null>(null);
   const { adminUser, logoutAdmin } = useAuth();
+
+  useEffect(() => {
+    const submergedEvent = state?.events.find(
+      (event) => event.type === 'critical' && /(?:is )?submerged (?:in floodwaters|under)/i.test(event.message),
+    );
+    if (!submergedEvent) return;
+
+    const alertKey = `${submergedEvent.id}:${submergedEvent.message}`;
+    if (lastFloodAlertKey.current === alertKey) return;
+
+    lastFloodAlertKey.current = alertKey;
+    setFloodRescueAlert(submergedEvent);
+  }, [state?.events]);
 
   const handleMapClickForEmergency = (coords: [number, number]) => {
     setClickCoords(coords);
@@ -570,6 +587,66 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
 
       {showAssumptions && (
         <AssumptionsModal onClose={() => setShowAssumptions(false)} />
+      )}
+
+      {floodRescueAlert && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="flood-rescue-alert-title"
+          aria-describedby="flood-rescue-alert-description"
+        >
+          <section className="w-full max-w-lg overflow-hidden rounded-2xl border border-red-200 bg-white shadow-2xl shadow-red-950/30">
+            <div className="flex items-start gap-4 bg-red-700 px-6 py-5 text-white">
+              <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25">
+                <AlertTriangle className="h-6 w-6" aria-hidden="true" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-red-100">
+                  Critical flood rescue alert
+                </p>
+                <h2 id="flood-rescue-alert-title" className="mt-1 text-xl font-extrabold leading-tight">
+                  Patient submerged in floodwater
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFloodRescueAlert(null)}
+                className="rounded-lg p-2 text-white/80 transition hover:bg-white/15 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                aria-label="Dismiss flood rescue alert"
+              >
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className="space-y-4 px-6 py-5">
+              <p id="flood-rescue-alert-description" className="text-sm leading-relaxed text-slate-700">
+                The incident scene is under actual floodwater before the ambulance could arrive. The patient is out of reach of the ground ambulance.
+              </p>
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                <p className="text-sm font-extrabold uppercase tracking-wide text-red-800">
+                  Call emergency and rescue services now
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-red-700">
+                  Request an immediate water rescue, such as SDRF or boat extraction. Do not send the ambulance into floodwater.
+                </p>
+              </div>
+              <p className="rounded-lg bg-slate-50 px-3 py-2 font-mono text-xs leading-relaxed text-slate-600">
+                {floodRescueAlert.message}
+              </p>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setFloodRescueAlert(null)}
+                  className="rounded-lg bg-red-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                >
+                  Acknowledge alert
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
       )}
     </div>
   );

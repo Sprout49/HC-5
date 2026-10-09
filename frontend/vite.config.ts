@@ -1,9 +1,12 @@
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  cacheDir: join(tmpdir(), 'hc-5-vite-cache'),
   plugins: [
     tailwindcss(),
     react()
