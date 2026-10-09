@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as maplibregl from 'maplibre-gl';
 // @ts-ignore
 import maplibreglWorker from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
-import { useSimulation } from '../../context/SimulationContext';
+import { useSimulation, API_BASE } from '../../context/SimulationContext';
 import type { Ambulance, Hospital, Incident, Road, Zone, MedicalCamp } from '../../types/simulation';
 import { Compass, Layers } from 'lucide-react';
 
@@ -88,7 +88,7 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
     map.on('load', async () => {
       // 1. Waterways Base Layer (Mutha & Mula Rivers)
       try {
-        const waterRes = await fetch('http://127.0.0.1:8000/api/gis/waterways');
+        const waterRes = await fetch(`${API_BASE}/gis/waterways`);
         const waterGeo = await waterRes.json();
         map.addSource('waterways-source', {
           type: 'geojson',
@@ -315,7 +315,7 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
       // 6. Fetch and Render 3D Buildings Footprints on TOP of ground/flood layers
       // This ensures 3D building walls physically rise out of the streets and water corridors
       try {
-        const bldRes = await fetch('http://127.0.0.1:8000/api/gis/buildings');
+        const bldRes = await fetch(`${API_BASE}/gis/buildings`);
         const bldGeo = await bldRes.json();
 
         map.addSource('buildings-source', {
@@ -341,7 +341,7 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
 
       // Load static road network once on initial map load
       try {
-        const roadsRes = await fetch('http://127.0.0.1:8000/api/gis/roads');
+        const roadsRes = await fetch(`${API_BASE}/gis/roads`);
         const roadsGeo = await roadsRes.json();
         const staticRoadsSource = map.getSource('roads-source') as maplibregl.GeoJSONSource;
         if (staticRoadsSource) {

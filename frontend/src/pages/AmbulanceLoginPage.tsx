@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE } from '../context/SimulationContext';
 import { useAuth } from '../context/AuthContext';
 import { Ambulance as AmbulanceIcon, KeyRound, ArrowRight, Shield, AlertCircle, Radio, Car, Check } from 'lucide-react';
 
@@ -28,7 +29,7 @@ export const AmbulanceLoginPage: React.FC<AmbulanceLoginPageProps> = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/auth/ambulances')
+    fetch(`${API_BASE}/auth/ambulances`)
       .then((res) => res.json())
       .then((data: AvailableAmbulance[]) => {
         if (Array.isArray(data) && data.length > 0) {
