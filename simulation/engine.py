@@ -1,3 +1,4 @@
+import re
 """
 Core Shared Simulation World Engine for HC-05.
 Manages the single source of truth for disaster progression,
@@ -902,6 +903,109 @@ class SimulationEngine:
         # Multi-criteria dispatch optimization automatically selects AMB-02 as the fastest available unit!
         self.create_incident(73.8440, 18.5160, severity="HIGH", patient_count=1)
         self.log_event("Demo scenario loaded: 4 ambulances staged across distinct zones. Flood active along Mutha riverbed.", "alert")
+
+
+    def get_ambulance_credentials(self) -> Dict[str, str]:
+        if not hasattr(self, "ambulance_credentials") or not self.ambulance_credentials:
+            self.ambulance_credentials = {}
+        for a in self.ambulances:
+            aid = a["ambulance_id"]
+            if aid not in self.ambulance_credentials:
+                self.ambulance_credentials[aid] = a.get("password", "demo123")
+        return self.ambulance_credentials
+
+    def add_ambulance(self, amb_data: Dict[str, Any]) -> Dict[str, Any]:
+        raw_id = (amb_data.get("ambulance_id") or "").strip().upper()
+        if not raw_id:
+            nums = []
+            for a in self.ambulances:
+                m = re.search(r"AMB-(\d+)", a["ambulance_id"])
+                if m:
+                    nums.append(int(m.group(1)))
+            next_num = max(nums, default=0) + 1
+            raw_id = f"AMB-{next_num:02d}"
+
+        if any(a["ambulance_id"] == raw_id for a in self.ambulances):
+            raise ValueError(f"Ambulance unit {raw_id} already exists in fleet")
+
+        zone_id = amb_data.get("assigned_zone", "Z1")
+        ZONE_STAGING_LOCATIONS = {
+            "Z1": [73.8512, 18.5312],
+            "Z2": [73.8550, 18.5195],
+            "Z3": [73.8744, 18.5284],
+            "Z4": [73.8390, 18.5170],
+            "Z5": [73.8570, 18.5010],
+            "Z6": [73.8760, 18.5150],
+            "Z7": [73.8810, 18.5490],
+            "Z8": [73.8120, 18.5070],
+        }
+        loc = amb_data.get("current_location") or ZONE_STAGING_LOCATIONS.get(zone_id, [73.8512, 18.5312])
+        callsign = amb_data.get("callsign") or f"Ambulance {raw_id.replace('AMB-', '')}"
+        vtype = amb_data.get("type", "ALS").upper()
+        if vtype not in ["ALS", "BLS", "CC"]:
+            vtype = "ALS"
+        password = amb_data.get("password") or "demo123"
+
+        new_amb = {
+            "ambulance_id": raw_id,
+            "callsign": callsign,
+            "type": vtype,
+            "status": "AVAILABLE",
+            "assigned_zone": zone_id,
+            "current_location": [float(loc[0]), float(loc[1])],
+            "target_location": None,
+            "current_incident_id": None,
+            "active_route": None,
+            "previous_route": None,
+            "route_progress": 0.0,
+            "speed_multiplier": 1.0,
+            "speed_kmh": float(amb_data.get("speed_kmh", 45.0)),
+            "eta_minutes": 0.0,
+            "patients_onboard": 0,
+            "patient_capacity": int(amb_data.get("patient_capacity", 2)),
+            "password": password
+        }
+
+        self.ambulances.append(new_amb)
+        self.get_ambulance_credentials()[raw_id] = password
+        self.log_event(
+            f"?? NEW AMBULANCE ADDED: {raw_id} ({callsign}, {vtype}) deployed to Zone {zone_id} staging.",
+            "info"
+        )
+        return new_amb
+
+    def delete_ambulance(self, ambulance_id: str) -> bool:
+        aid = ambulance_id.strip().upper()
+        idx_to_del = None
+        for i, a in enumerate(self.ambulances):
+            if a["ambulance_id"] == aid:
+                idx_to_del = i
+                break
+
+        if idx_to_del is None:
+            return False
+
+        amb = self.ambulances.pop(idx_to_del)
+        if amb.get("current_incident_id"):
+            for inc in self.incidents:
+                if inc["incident_id"] == amb["current_incident_id"]:
+                    if inc.get("status") in ["ASSIGNED", "DISPATCHED"]:
+                        inc["status"] = "PENDING"
+                        inc["assigned_ambulance_id"] = None
+                        self.log_event(
+                            f"?? Incident {inc['incident_id']} returned to PENDING queue due to {aid} decommissioning.",
+                            "warning"
+                        )
+
+        creds = self.get_ambulance_credentials()
+        if aid in creds:
+            del creds[aid]
+
+        self.log_event(
+            f"??? AMBULANCE DECOMMISSIONED: Unit {aid} ({amb.get('callsign')}) removed from active fleet.",
+            "alert"
+        )
+        return True
 
     def get_full_state(self) -> Dict[str, Any]:
         """Full simulation state broadcast to Admin and Ambulance clients."""

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { useSimulation } from '../context/SimulationContext';
+import { useAuth } from '../context/AuthContext';
 import { CityMap3D } from '../components/map/CityMap3D';
 import {
   Navigation2,
@@ -8,8 +8,8 @@ import {
   ArrowRight,
   Radio,
   Check,
+  LogOut,
   Shield,
-  Ambulance as AmbulanceIcon,
 } from 'lucide-react';
 
 interface AmbulanceDashboardProps {
@@ -17,93 +17,15 @@ interface AmbulanceDashboardProps {
   onSwitchTab?: (tab: 'admin' | 'ambulance') => void;
 }
 
-export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = ({ activeTab = 'ambulance', onSwitchTab }) => {
+export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
   const { state, acceptCall, pickupPatient, startHospitalRoute } = useSimulation();
-
-  const [activeAmbulanceId, setActiveAmbulanceId] = useState<string>('AMB-01');
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
-  const [loginPassword, setLoginPassword] = useState<string>('demo123');
+  const { ambulanceUser, logoutAmbulance } = useAuth();
+  const activeAmbulanceId = ambulanceUser?.ambulance_id || 'AMB-01';
 
   const currentAmbulance = state?.ambulances.find((a) => a.ambulance_id === activeAmbulanceId);
   const currentIncident = state?.incidents.find(
     (i) => i.incident_id === currentAmbulance?.current_incident_id
   );
-
-  // Auto-select unit with active call, route, or distress if current unit is idle
-  useEffect(() => {
-    if (!state?.ambulances) return;
-    const activeUnit = state.ambulances.find(
-      (a) => a.status === 'CALL_RECEIVED' || a.status.includes('EN_ROUTE') || a.status === 'AT_PATIENT' || a.status === 'TRAPPED_IN_FLOOD' || a.status === 'RELOCATING_TO_SAFETY'
-    );
-    if (activeUnit && (!currentAmbulance || currentAmbulance.status === 'AVAILABLE')) {
-      setActiveAmbulanceId(activeUnit.ambulance_id);
-    }
-  }, [state?.ambulances]);
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (loginPassword === 'demo123') {
-      setIsLoggedIn(true);
-    } else {
-      alert('Demo password is demo123');
-    }
-  };
-
-  if (!isLoggedIn) {
-    return (
-      <div className="w-screen h-screen flex items-center justify-center bg-slate-100 p-4 select-none">
-        <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 p-8 w-full max-w-md">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl shadow-md">
-              🚑
-            </div>
-            <div>
-              <h2 className="text-xl font-black text-slate-900">HC-05 Response</h2>
-              <p className="text-xs text-slate-500 font-medium">Ambulance In-Vehicle Navigation Portal</p>
-            </div>
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                Select Ambulance Unit
-              </label>
-              <select
-                value={activeAmbulanceId}
-                onChange={(e) => setActiveAmbulanceId(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800"
-              >
-                {state?.ambulances.map((amb) => (
-                  <option key={amb.ambulance_id} value={amb.ambulance_id}>
-                    {amb.ambulance_id} ({amb.type} — Zone {amb.assigned_zone}) {amb.status !== 'AVAILABLE' ? `[${amb.status}]` : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                Operator Password (Demo: demo123)
-              </label>
-              <input
-                type="password"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md transition-all mt-2"
-            >
-              LOGIN TO VEHICLE TERMINAL
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="relative w-screen h-screen overflow-hidden flex flex-col bg-slate-100 select-none">
@@ -129,57 +51,26 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = ({ activeTa
           </div>
         </div>
 
-        {/* Right Section: Vehicle Switcher & Portal Switcher */}
+        {/* Right Section: Driver Session & Controls */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 bg-slate-50 p-1 rounded-xl border border-slate-200">
-            <span className="text-[11px] font-bold text-slate-400 px-1">Unit:</span>
-            {state?.ambulances.map((amb) => {
-              const hasCall = amb.status === 'CALL_RECEIVED';
-              const isMoving = amb.status.includes('EN_ROUTE');
-              return (
-                <button
-                  key={amb.ambulance_id}
-                  onClick={() => setActiveAmbulanceId(amb.ambulance_id)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg transition-all ${
-                    activeAmbulanceId === amb.ambulance_id
-                      ? 'bg-blue-600 text-white shadow-xs'
-                      : 'text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  <span>{amb.ambulance_id}</span>
-                  {hasCall && <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />}
-                  {isMoving && <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />}
-                </button>
-              );
-            })}
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200/80 rounded-xl">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs font-black text-emerald-950">
+              Unit {ambulanceUser?.ambulance_id || activeAmbulanceId} Operator
+            </span>
           </div>
 
-          {onSwitchTab && (
-            <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200">
-              <button
-                onClick={() => onSwitchTab('admin')}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === 'admin'
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Shield className="w-3 h-3" />
-                <span>Admin</span>
-              </button>
-              <button
-                onClick={() => onSwitchTab('ambulance')}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === 'ambulance'
-                    ? 'bg-slate-900 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <AmbulanceIcon className="w-3 h-3" />
-                <span>Ambulance</span>
-              </button>
-            </div>
-          )}
+          <button
+            onClick={() => {
+              logoutAmbulance();
+              window.location.href = '/ambulance/login';
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
+            title="Sign out of vehicle CAD terminal"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>End Shift / Sign Out</span>
+          </button>
         </div>
       </header>
 

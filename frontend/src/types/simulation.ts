@@ -96,6 +96,7 @@ export interface Ambulance {
   is_trapped?: boolean;
   safe_staging_name?: string;
   diverted_hospital?: boolean;
+  password?: string;
 }
 
 export interface Incident {

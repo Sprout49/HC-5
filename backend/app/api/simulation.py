@@ -89,3 +89,35 @@ async def position_fleet():
     state = engine.get_full_state()
     await ws_manager.broadcast(state)
     return state
+
+
+class CreateAmbulanceRequest(BaseModel):
+    ambulance_id: str | None = None
+    callsign: str | None = None
+    type: str = "ALS"
+    password: str = "demo123"
+    assigned_zone: str = "Z1"
+    speed_kmh: float = 45.0
+
+@router.post("/ambulances")
+async def add_ambulance_endpoint(req: CreateAmbulanceRequest):
+    engine = SimulationEngine.get_instance()
+    try:
+        new_amb = engine.add_ambulance(req.dict())
+    except ValueError as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail=str(e))
+    state = engine.get_full_state()
+    await ws_manager.broadcast(state)
+    return {"success": True, "ambulance": new_amb, "state": state}
+
+@router.delete("/ambulances/{ambulance_id}")
+async def delete_ambulance_endpoint(ambulance_id: str):
+    engine = SimulationEngine.get_instance()
+    deleted = engine.delete_ambulance(ambulance_id)
+    if not deleted:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail=f"Ambulance unit {ambulance_id} not found")
+    state = engine.get_full_state()
+    await ws_manager.broadcast(state)
+    return {"success": True, "message": f"Ambulance {ambulance_id} decommissioned", "state": state}

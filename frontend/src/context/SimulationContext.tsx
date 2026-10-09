@@ -17,6 +17,15 @@ interface SimulationContextType {
   pickupPatient: (ambulanceId: string) => Promise<void>;
   startHospitalRoute: (ambulanceId: string) => Promise<void>;
   deployMedicalCamp: (zoneId: string) => Promise<void>;
+  addAmbulance: (ambData: {
+    ambulance_id?: string;
+    callsign?: string;
+    type?: string;
+    password?: string;
+    assigned_zone?: string;
+    speed_kmh?: number;
+  }) => Promise<{ success: boolean; error?: string }>;
+  deleteAmbulance: (ambulanceId: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 const SimulationContext = createContext<SimulationContextType | null>(null);
@@ -242,6 +251,40 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
+  const addAmbulance = async (ambData: any) => {
+    try {
+      const res = await fetch(`${API_BASE}/simulation/ambulances`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ambData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, error: data.detail || 'Failed to add ambulance' };
+      }
+      if (data.state) setState(data.state);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network error' };
+    }
+  };
+
+  const deleteAmbulance = async (ambulanceId: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/simulation/ambulances/${ambulanceId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, error: data.detail || 'Failed to delete ambulance' };
+      }
+      if (data.state) setState(data.state);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network error' };
+    }
+  };
+
   const deployMedicalCamp = async (zoneId: string) => {
     try {
       const res = await fetch(`${API_BASE}/resources/deploy_camp`, {
@@ -276,6 +319,8 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         pickupPatient,
         startHospitalRoute,
         deployMedicalCamp,
+        addAmbulance,
+        deleteAmbulance,
       }}
     >
       {children}

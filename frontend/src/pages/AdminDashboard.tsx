@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useSimulation } from '../context/SimulationContext';
 import { CityMap3D } from '../components/map/CityMap3D';
 import { DetailDrawer } from '../components/admin/DetailDrawer';
+import { FleetManagementModal } from '../components/admin/FleetManagementModal';
+import { useAuth } from '../context/AuthContext';
 import { CreateEmergencyModal } from '../components/admin/CreateEmergencyModal';
 import { AssumptionsModal } from '../components/admin/AssumptionsModal';
 import type { SeverityLevel } from '../types/simulation';
@@ -18,6 +20,7 @@ import {
   Tent,
   Shield,
   Ambulance as AmbulanceIcon,
+  LogOut,
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -43,6 +46,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
   const [clickCoords, setClickCoords] = useState<[number, number] | null>(null);
   const [selectedObject, setSelectedObject] = useState<{ type: any; data: any } | null>(null);
   const [showAssumptions, setShowAssumptions] = useState(false);
+  const [showFleetModal, setShowFleetModal] = useState(false);
+  const { adminUser, logoutAdmin } = useAuth();
 
   const handleMapClickForEmergency = (coords: [number, number]) => {
     setClickCoords(coords);
@@ -194,12 +199,39 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
           </button>
 
           <button
+            onClick={() => setShowFleetModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
+            title="Manage Fleet, Commission/Decommission Vehicles and View Driver Logins"
+          >
+            <AmbulanceIcon className="w-4 h-4 text-indigo-600" />
+            <span>Fleet ({state?.ambulances?.length || 0})</span>
+          </button>
+
+          <button
             onClick={() => setShowAssumptions(true)}
             className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
             title="View Simulation Assumptions"
           >
             <HelpCircle className="w-4 h-4" />
           </button>
+
+                    {/* Admin Profile & Logout */}
+          <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 rounded-lg text-xs font-bold text-slate-700">
+              <Shield className="w-3.5 h-3.5 text-blue-600" />
+              <span>{adminUser?.name || 'Lead Dispatcher'}</span>
+            </div>
+            <button
+              onClick={() => {
+                logoutAdmin();
+                window.location.href = '/admin/login';
+              }}
+              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+              title="Sign Out of Admin Console"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
 
           {/* Integrated Portal Switcher Pill */}
           {onSwitchTab && (
@@ -533,6 +565,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
           onSwitchTab={onSwitchTab}
         />
       )}
+
+      <FleetManagementModal isOpen={showFleetModal} onClose={() => setShowFleetModal(false)} />
 
       {showAssumptions && (
         <AssumptionsModal onClose={() => setShowAssumptions(false)} />
