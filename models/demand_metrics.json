@@ -1,0 +1,11 @@
+{
+  "model": "Zone Emergency Demand Predictor",
+  "algorithm": "RandomForestRegressor",
+  "train_samples": 768,
+  "test_samples": 192,
+  "metrics": {
+    "MAE": 4.938,
+    "RMSE": 18.36,
+    "R2_score": 0.969
+  }
+}

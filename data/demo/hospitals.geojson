@@ -1,0 +1,211 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "H1",
+        "name": "Sassoon General Hospital",
+        "zone_id": "Z3",
+        "type": "Government Tertiary & Trauma Level 1",
+        "total_beds": 1200,
+        "available_beds": 340,
+        "total_icu": 150,
+        "available_icu": 28,
+        "has_trauma_center": true,
+        "specialties": [
+          "Trauma",
+          "Surgery",
+          "ICU",
+          "Burn Unit",
+          "Pediatrics"
+        ],
+        "elevation_m": 556.0,
+        "capacity_utilization": 71.7,
+        "status": "OPERATIONAL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8744,
+          18.5284
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "H2",
+        "name": "KEM Hospital Pune",
+        "zone_id": "Z2",
+        "type": "Multispeciality Charitable",
+        "total_beds": 550,
+        "available_beds": 115,
+        "total_icu": 60,
+        "available_icu": 14,
+        "has_trauma_center": true,
+        "specialties": [
+          "Cardiac",
+          "Critical Care",
+          "Neurology"
+        ],
+        "elevation_m": 559.0,
+        "capacity_utilization": 79.1,
+        "status": "OPERATIONAL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8677,
+          18.5209
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "H3",
+        "name": "Ruby Hall Clinic",
+        "zone_id": "Z3",
+        "type": "Super Speciality Tertiary",
+        "total_beds": 600,
+        "available_beds": 140,
+        "total_icu": 80,
+        "available_icu": 18,
+        "has_trauma_center": true,
+        "specialties": [
+          "Cardiology",
+          "Trauma",
+          "Nephrology",
+          "Organ Transplant"
+        ],
+        "elevation_m": 557.5,
+        "capacity_utilization": 76.7,
+        "status": "OPERATIONAL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8821,
+          18.5342
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "H4",
+        "name": "Jehangir Hospital",
+        "zone_id": "Z3",
+        "type": "Tertiary Referral Hospital",
+        "total_beds": 350,
+        "available_beds": 75,
+        "total_icu": 45,
+        "available_icu": 9,
+        "has_trauma_center": true,
+        "specialties": [
+          "Trauma",
+          "Orthopedics",
+          "Emergency Medicine"
+        ],
+        "elevation_m": 558.0,
+        "capacity_utilization": 78.6,
+        "status": "OPERATIONAL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8812,
+          18.5331
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "H5",
+        "name": "Sancheti Hospital",
+        "zone_id": "Z1",
+        "type": "Orthopedic & Trauma Super Speciality",
+        "total_beds": 200,
+        "available_beds": 50,
+        "total_icu": 30,
+        "available_icu": 8,
+        "has_trauma_center": true,
+        "specialties": [
+          "Orthopedics",
+          "Emergency",
+          "Polytrauma"
+        ],
+        "elevation_m": 555.0,
+        "capacity_utilization": 75.0,
+        "status": "OPERATIONAL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8512,
+          18.5312
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "H6",
+        "name": "Deenanath Mangeshkar Hospital",
+        "zone_id": "Z4",
+        "type": "Super Speciality Tertiary",
+        "total_beds": 800,
+        "available_beds": 195,
+        "total_icu": 90,
+        "available_icu": 24,
+        "has_trauma_center": true,
+        "specialties": [
+          "Trauma",
+          "ICU",
+          "Cardiology",
+          "Emergency"
+        ],
+        "elevation_m": 556.5,
+        "capacity_utilization": 75.6,
+        "status": "OPERATIONAL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.829,
+          18.5028
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "H7",
+        "name": "Pune Cantonment Board Hospital",
+        "zone_id": "Z6",
+        "type": "Civil & Defense Hospital",
+        "total_beds": 180,
+        "available_beds": 55,
+        "total_icu": 20,
+        "available_icu": 6,
+        "has_trauma_center": false,
+        "specialties": [
+          "General Medicine",
+          "Emergency triage"
+        ],
+        "elevation_m": 566.0,
+        "capacity_utilization": 69.4,
+        "status": "OPERATIONAL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8845,
+          18.5075
+        ]
+      }
+    }
+  ]
+}

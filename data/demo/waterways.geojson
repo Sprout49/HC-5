@@ -1,0 +1,103 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "RIVER_MUTHA",
+        "name": "Mutha River",
+        "type": "river",
+        "base_water_level_m": 551.5
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.82,
+            18.495
+          ],
+          [
+            73.828,
+            18.508
+          ],
+          [
+            73.839,
+            18.518
+          ],
+          [
+            73.849,
+            18.528
+          ],
+          [
+            73.858,
+            18.532
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "RIVER_MULA",
+        "name": "Mula River",
+        "type": "river",
+        "base_water_level_m": 551.2
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.83,
+            18.558
+          ],
+          [
+            73.842,
+            18.548
+          ],
+          [
+            73.85,
+            18.54
+          ],
+          [
+            73.858,
+            18.532
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "RIVER_MULA_MUTHA",
+        "name": "Mula-Mutha River (Confluence Eastbound)",
+        "type": "river",
+        "base_water_level_m": 550.8
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.858,
+            18.532
+          ],
+          [
+            73.872,
+            18.538
+          ],
+          [
+            73.888,
+            18.541
+          ],
+          [
+            73.908,
+            18.539
+          ],
+          [
+            73.925,
+            18.535
+          ]
+        ]
+      }
+    }
+  ]
+}

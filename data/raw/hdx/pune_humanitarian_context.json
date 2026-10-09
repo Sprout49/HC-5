@@ -1,0 +1,61 @@
+{
+  "dataset_name": "HDX India Subnational Humanitarian Demographics & Boundaries",
+  "hdx_id": "cod-ps-ind",
+  "source_url": "https://data.humdata.org/dataset/cod-ps-ind",
+  "license": "Creative Commons Attribution for Intergovernmental Organisations",
+  "attribution": "UN OCHA / Survey of India / HDX",
+  "pune_division": {
+    "state": "Maharashtra",
+    "district": "Pune",
+    "urban_zones": [
+      {
+        "id": "Z1",
+        "name": "Shivajinagar & Sangam",
+        "population": 145000,
+        "vulnerability_index": 0.78
+      },
+      {
+        "id": "Z2",
+        "name": "Kasba & Budhwar Peth",
+        "population": 210000,
+        "vulnerability_index": 0.72
+      },
+      {
+        "id": "Z3",
+        "name": "Koregaon Park & Bund Garden",
+        "population": 98000,
+        "vulnerability_index": 0.82
+      },
+      {
+        "id": "Z4",
+        "name": "Deccan Gymkhana & Erandwane",
+        "population": 132000,
+        "vulnerability_index": 0.65
+      },
+      {
+        "id": "Z5",
+        "name": "Swargate & Parvati",
+        "population": 185000,
+        "vulnerability_index": 0.68
+      },
+      {
+        "id": "Z6",
+        "name": "Pune Cantonment & Camp",
+        "population": 115000,
+        "vulnerability_index": 0.58
+      },
+      {
+        "id": "Z7",
+        "name": "Yerawada (North Riverbank)",
+        "population": 178000,
+        "vulnerability_index": 0.88
+      },
+      {
+        "id": "Z8",
+        "name": "Kothrud East",
+        "population": 160000,
+        "vulnerability_index": 0.45
+      }
+    ]
+  }
+}

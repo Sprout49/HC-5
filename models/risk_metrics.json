@@ -1,0 +1,47 @@
+{
+  "model": "Zone Risk Classifier & Score Predictor",
+  "algorithm": "GradientBoostingClassifier & Regressor",
+  "train_samples": 768,
+  "test_samples": 192,
+  "accuracy": 0.844,
+  "f1_score_weighted": 0.844,
+  "classification_report": {
+    "CRITICAL": {
+      "precision": 0.8333333333333334,
+      "recall": 0.5,
+      "f1-score": 0.625,
+      "support": 10.0
+    },
+    "HIGH": {
+      "precision": 0.5,
+      "recall": 0.625,
+      "f1-score": 0.5555555555555556,
+      "support": 16.0
+    },
+    "LOW": {
+      "precision": 0.8793103448275862,
+      "recall": 0.8793103448275862,
+      "f1-score": 0.8793103448275862,
+      "support": 58.0
+    },
+    "MEDIUM": {
+      "precision": 0.8888888888888888,
+      "recall": 0.8888888888888888,
+      "f1-score": 0.8888888888888888,
+      "support": 108.0
+    },
+    "accuracy": 0.84375,
+    "macro avg": {
+      "precision": 0.7753831417624522,
+      "recall": 0.7232998084291188,
+      "f1-score": 0.7371886973180076,
+      "support": 192.0
+    },
+    "weighted avg": {
+      "precision": 0.8506944444444445,
+      "recall": 0.84375,
+      "f1-score": 0.8444733796296297,
+      "support": 192.0
+    }
+  }
+}

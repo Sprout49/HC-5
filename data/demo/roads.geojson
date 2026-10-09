@@ -1,0 +1,769 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R01",
+        "name": "Jangali Maharaj Road (JM Road)",
+        "from_node": "N_SANCHETI_JNC",
+        "to_node": "N_JM_ROAD_S",
+        "road_class": "primary",
+        "elevation_m": 557.0,
+        "speed_limit_kmh": 50,
+        "length_m": 1716.7,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.8512,
+            18.5312
+          ],
+          [
+            73.8475,
+            18.5285
+          ],
+          [
+            73.844,
+            18.518
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R02",
+        "name": "Fergusson College Road (FC Road)",
+        "from_node": "N_SANCHETI_JNC",
+        "to_node": "N_DECCAN_GYM",
+        "road_class": "primary",
+        "elevation_m": 558.5,
+        "speed_limit_kmh": 45,
+        "length_m": 2233.3,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.8512,
+            18.5312
+          ],
+          [
+            73.8445,
+            18.529
+          ],
+          [
+            73.8415,
+            18.5195
+          ],
+          [
+            73.839,
+            18.517
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R03",
+        "name": "Karve Road West Link",
+        "from_node": "N_DECCAN_GYM",
+        "to_node": "N_ERANDWANE",
+        "road_class": "primary",
+        "elevation_m": 558.0,
+        "speed_limit_kmh": 50,
+        "length_m": 1308.8,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.839,
+            18.517
+          ],
+          [
+            73.831,
+            18.508
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R04",
+        "name": "Erandwane to Deenanath Hospital Link",
+        "from_node": "N_ERANDWANE",
+        "to_node": "N_DEENANATH_HOSP",
+        "road_class": "secondary",
+        "elevation_m": 557.0,
+        "speed_limit_kmh": 40,
+        "length_m": 615.5,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.831,
+            18.508
+          ],
+          [
+            73.829,
+            18.5028
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R05",
+        "name": "Kothrud Connector",
+        "from_node": "N_ERANDWANE",
+        "to_node": "N_KOTHRUD_STAND",
+        "road_class": "primary",
+        "elevation_m": 566.0,
+        "speed_limit_kmh": 50,
+        "length_m": 2006.5,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.831,
+            18.508
+          ],
+          [
+            73.812,
+            18.507
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R06",
+        "name": "Sambhaji Bridge (Lakdi Pul)",
+        "from_node": "N_DECCAN_GYM",
+        "to_node": "N_SHANIWAR_WADA",
+        "road_class": "bridge",
+        "elevation_m": 554.5,
+        "speed_limit_kmh": 35,
+        "length_m": 1737.6,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.839,
+            18.517
+          ],
+          [
+            73.848,
+            18.517
+          ],
+          [
+            73.855,
+            18.5195
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R07",
+        "name": "Z-Bridge Pedestrian & Emergency Span",
+        "from_node": "N_JM_ROAD_S",
+        "to_node": "N_SHANIWAR_WADA",
+        "road_class": "bridge",
+        "elevation_m": 553.8,
+        "speed_limit_kmh": 30,
+        "length_m": 1192.7,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.844,
+            18.518
+          ],
+          [
+            73.846,
+            18.5175
+          ],
+          [
+            73.855,
+            18.5195
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R08",
+        "name": "Shivaji Road (Heritage Arterial North)",
+        "from_node": "N_SHANIWAR_WADA",
+        "to_node": "N_KASBA_CORE",
+        "road_class": "primary",
+        "elevation_m": 560.0,
+        "speed_limit_kmh": 45,
+        "length_m": 357.6,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.855,
+            18.5195
+          ],
+          [
+            73.858,
+            18.518
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R08b",
+        "name": "Shivaji Road (Kasba to Swargate Arterial)",
+        "from_node": "N_KASBA_CORE",
+        "to_node": "N_SWARGATE_HUB",
+        "road_class": "primary",
+        "elevation_m": 561.0,
+        "speed_limit_kmh": 45,
+        "length_m": 1893.3,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.858,
+            18.518
+          ],
+          [
+            73.857,
+            18.501
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R09",
+        "name": "Kasba Core to KEM Hospital",
+        "from_node": "N_KASBA_CORE",
+        "to_node": "N_KEM_HOSP",
+        "road_class": "secondary",
+        "elevation_m": 559.0,
+        "speed_limit_kmh": 35,
+        "length_m": 1166.8,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.858,
+            18.518
+          ],
+          [
+            73.866,
+            18.5185
+          ],
+          [
+            73.8677,
+            18.5209
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R10",
+        "name": "KEM Hospital to Sassoon Express Link",
+        "from_node": "N_KEM_HOSP",
+        "to_node": "N_SASSOON_MAIN",
+        "road_class": "primary",
+        "elevation_m": 558.0,
+        "speed_limit_kmh": 45,
+        "length_m": 1092.9,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.8677,
+            18.5209
+          ],
+          [
+            73.8744,
+            18.5284
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R11",
+        "name": "Sassoon Main to Pune Station",
+        "from_node": "N_SASSOON_MAIN",
+        "to_node": "N_PUNE_STATION",
+        "road_class": "secondary",
+        "elevation_m": 557.5,
+        "speed_limit_kmh": 35,
+        "length_m": 129.4,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.8744,
+            18.5284
+          ],
+          [
+            73.874,
+            18.5295
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R12",
+        "name": "Station to Ruby Hall Corridor",
+        "from_node": "N_PUNE_STATION",
+        "to_node": "N_RUBY_HALL",
+        "road_class": "primary",
+        "elevation_m": 557.8,
+        "speed_limit_kmh": 40,
+        "length_m": 1001.2,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.874,
+            18.5295
+          ],
+          [
+            73.8821,
+            18.5342
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R13",
+        "name": "Koregaon Park Main North Road",
+        "from_node": "N_RUBY_HALL",
+        "to_node": "N_KOREGAON_MAIN",
+        "road_class": "primary",
+        "elevation_m": 555.0,
+        "speed_limit_kmh": 45,
+        "length_m": 1374.7,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.8821,
+            18.5342
+          ],
+          [
+            73.895,
+            18.536
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R14",
+        "name": "Bund Garden Road & Confluence Bridge",
+        "from_node": "N_RUBY_HALL",
+        "to_node": "N_YERAWADA_JNC",
+        "road_class": "bridge",
+        "elevation_m": 553.0,
+        "speed_limit_kmh": 40,
+        "length_m": 1884.3,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.8821,
+            18.5342
+          ],
+          [
+            73.878,
+            18.5375
+          ],
+          [
+            73.881,
+            18.549
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R15",
+        "name": "Yerawada Floodplain Arterial",
+        "from_node": "N_YERAWADA_JNC",
+        "to_node": "N_YERAWADA_NORTH",
+        "road_class": "primary",
+        "elevation_m": 551.8,
+        "speed_limit_kmh": 40,
+        "length_m": 850.3,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.881,
+            18.549
+          ],
+          [
+            73.886,
+            18.555
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R16",
+        "name": "Sangam Bridge (COEP to Sassoon Arterial)",
+        "from_node": "N_SANCHETI_JNC",
+        "to_node": "N_SASSOON_MAIN",
+        "road_class": "primary",
+        "elevation_m": 556.5,
+        "speed_limit_kmh": 50,
+        "length_m": 2498.4,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.8512,
+            18.5312
+          ],
+          [
+            73.8565,
+            18.529
+          ],
+          [
+            73.8744,
+            18.5284
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R17",
+        "name": "Riverfront Bund Expressway (R17)",
+        "from_node": "N_SANCHETI_JNC",
+        "to_node": "N_PUNE_STATION",
+        "road_class": "arterial",
+        "elevation_m": 552.2,
+        "speed_limit_kmh": 55,
+        "length_m": 2749.6,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.8512,
+            18.5312
+          ],
+          [
+            73.8565,
+            18.529
+          ],
+          [
+            73.858,
+            18.5325
+          ],
+          [
+            73.874,
+            18.5295
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R18",
+        "name": "Swargate to Camp MG Road",
+        "from_node": "N_SWARGATE_HUB",
+        "to_node": "N_CAMP_MG_RD",
+        "road_class": "primary",
+        "elevation_m": 563.0,
+        "speed_limit_kmh": 45,
+        "length_m": 2537.2,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.857,
+            18.501
+          ],
+          [
+            73.876,
+            18.515
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R19",
+        "name": "Camp East Street to Sassoon",
+        "from_node": "N_CAMP_MG_RD",
+        "to_node": "N_SASSOON_MAIN",
+        "road_class": "primary",
+        "elevation_m": 561.0,
+        "speed_limit_kmh": 45,
+        "length_m": 2707.1,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.876,
+            18.515
+          ],
+          [
+            73.882,
+            18.512
+          ],
+          [
+            73.8744,
+            18.5284
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R22",
+        "name": "Shivaji Bridge (Shivajinagar to Shaniwar Wada)",
+        "from_node": "N_SANCHETI_JNC",
+        "to_node": "N_SHANIWAR_WADA",
+        "road_class": "bridge",
+        "elevation_m": 556.2,
+        "speed_limit_kmh": 40,
+        "length_m": 1361.3,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.8512,
+            18.5312
+          ],
+          [
+            73.855,
+            18.5195
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R23",
+        "name": "Lakdi Pul & Deccan Cross Connector",
+        "from_node": "N_JM_ROAD_S",
+        "to_node": "N_DECCAN_GYM",
+        "road_class": "secondary",
+        "elevation_m": 558.0,
+        "speed_limit_kmh": 40,
+        "length_m": 538.8,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.844,
+            18.518
+          ],
+          [
+            73.839,
+            18.517
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R20",
+        "name": "Swargate to Parvati Foothill bypass",
+        "from_node": "N_SWARGATE_HUB",
+        "to_node": "N_PARVATI_FOOT",
+        "road_class": "secondary",
+        "elevation_m": 564.0,
+        "speed_limit_kmh": 40,
+        "length_m": 1099.9,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.857,
+            18.501
+          ],
+          [
+            73.848,
+            18.496
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R21",
+        "name": "Parvati to Erandwane Cross Link",
+        "from_node": "N_PARVATI_FOOT",
+        "to_node": "N_ERANDWANE",
+        "road_class": "secondary",
+        "elevation_m": 560.0,
+        "speed_limit_kmh": 40,
+        "length_m": 2234.7,
+        "flood_depth": 0.0,
+        "flooded_portion_pct": 0.0,
+        "status": "OPEN",
+        "reason": "Normal conditions: road elevation is above current water level"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            73.848,
+            18.496
+          ],
+          [
+            73.831,
+            18.508
+          ]
+        ]
+      }
+    }
+  ]
+}

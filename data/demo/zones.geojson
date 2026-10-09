@@ -1,0 +1,349 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "Z1",
+        "name": "Shivajinagar & Sangam",
+        "population": 145000,
+        "area_km2": 4.8,
+        "elevation_base_m": 554.0,
+        "river_proximity_m": 120,
+        "vulnerability_score": 0.78,
+        "medical_coverage_score": 0.65,
+        "risk_level": "LOW",
+        "risk_score": 0.22,
+        "predicted_demand": 14
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.835,
+              18.535
+            ],
+            [
+              73.865,
+              18.542
+            ],
+            [
+              73.868,
+              18.525
+            ],
+            [
+              73.842,
+              18.52
+            ],
+            [
+              73.835,
+              18.535
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "Z2",
+        "name": "Kasba & Budhwar Peth (Historic Core)",
+        "population": 210000,
+        "area_km2": 3.5,
+        "elevation_base_m": 558.0,
+        "river_proximity_m": 350,
+        "vulnerability_score": 0.72,
+        "medical_coverage_score": 0.85,
+        "risk_level": "LOW",
+        "risk_score": 0.22,
+        "predicted_demand": 21
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.848,
+              18.522
+            ],
+            [
+              73.872,
+              18.524
+            ],
+            [
+              73.87,
+              18.51
+            ],
+            [
+              73.845,
+              18.512
+            ],
+            [
+              73.848,
+              18.522
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "Z3",
+        "name": "Koregaon Park & Bund Garden",
+        "population": 98000,
+        "area_km2": 5.2,
+        "elevation_base_m": 552.0,
+        "river_proximity_m": 80,
+        "vulnerability_score": 0.82,
+        "medical_coverage_score": 0.9,
+        "risk_level": "LOW",
+        "risk_score": 0.22,
+        "predicted_demand": 10
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.875,
+              18.545
+            ],
+            [
+              73.915,
+              18.542
+            ],
+            [
+              73.91,
+              18.525
+            ],
+            [
+              73.872,
+              18.526
+            ],
+            [
+              73.875,
+              18.545
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "Z4",
+        "name": "Deccan Gymkhana & Erandwane",
+        "population": 132000,
+        "area_km2": 4.1,
+        "elevation_base_m": 553.5,
+        "river_proximity_m": 110,
+        "vulnerability_score": 0.65,
+        "medical_coverage_score": 0.75,
+        "risk_level": "LOW",
+        "risk_score": 0.22,
+        "predicted_demand": 13
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.822,
+              18.522
+            ],
+            [
+              73.846,
+              18.52
+            ],
+            [
+              73.842,
+              18.502
+            ],
+            [
+              73.818,
+              18.505
+            ],
+            [
+              73.822,
+              18.522
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "Z5",
+        "name": "Swargate & Parvati",
+        "population": 185000,
+        "area_km2": 4.9,
+        "elevation_base_m": 562.0,
+        "river_proximity_m": 600,
+        "vulnerability_score": 0.52,
+        "medical_coverage_score": 0.6,
+        "risk_level": "LOW",
+        "risk_score": 0.22,
+        "predicted_demand": 18
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.842,
+              18.505
+            ],
+            [
+              73.872,
+              18.505
+            ],
+            [
+              73.868,
+              18.485
+            ],
+            [
+              73.838,
+              18.488
+            ],
+            [
+              73.842,
+              18.505
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "Z6",
+        "name": "Pune Cantonment / Camp",
+        "population": 128000,
+        "area_km2": 6.0,
+        "elevation_base_m": 565.0,
+        "river_proximity_m": 900,
+        "vulnerability_score": 0.45,
+        "medical_coverage_score": 0.8,
+        "risk_level": "LOW",
+        "risk_score": 0.22,
+        "predicted_demand": 13
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.872,
+              18.52
+            ],
+            [
+              73.91,
+              18.522
+            ],
+            [
+              73.905,
+              18.495
+            ],
+            [
+              73.87,
+              18.498
+            ],
+            [
+              73.872,
+              18.52
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "Z7",
+        "name": "Yerawada (North Riverbank)",
+        "population": 165000,
+        "area_km2": 5.5,
+        "elevation_base_m": 551.0,
+        "river_proximity_m": 60,
+        "vulnerability_score": 0.88,
+        "medical_coverage_score": 0.4,
+        "risk_level": "LOW",
+        "risk_score": 0.22,
+        "predicted_demand": 16
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.862,
+              18.562
+            ],
+            [
+              73.905,
+              18.56
+            ],
+            [
+              73.902,
+              18.542
+            ],
+            [
+              73.86,
+              18.544
+            ],
+            [
+              73.862,
+              18.562
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "Z8",
+        "name": "Kothrud East (High Elevation)",
+        "population": 178000,
+        "area_km2": 5.0,
+        "elevation_base_m": 569.0,
+        "river_proximity_m": 1200,
+        "vulnerability_score": 0.35,
+        "medical_coverage_score": 0.7,
+        "risk_level": "LOW",
+        "risk_score": 0.22,
+        "predicted_demand": 18
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.798,
+              18.515
+            ],
+            [
+              73.824,
+              18.512
+            ],
+            [
+              73.82,
+              18.49
+            ],
+            [
+              73.795,
+              18.495
+            ],
+            [
+              73.798,
+              18.515
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

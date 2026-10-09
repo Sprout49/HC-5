@@ -1,0 +1,47 @@
+{
+  "model": "Road Accessibility Predictor",
+  "algorithm": "RandomForestClassifier",
+  "train_samples": 2304,
+  "test_samples": 576,
+  "accuracy": 0.852,
+  "f1_score_weighted": 0.792,
+  "classification_report": {
+    "0": {
+      "precision": 0.848314606741573,
+      "recall": 1.0,
+      "f1-score": 0.9179331306990881,
+      "support": 453.0
+    },
+    "1": {
+      "precision": 0.5,
+      "recall": 0.024096385542168676,
+      "f1-score": 0.04597701149425287,
+      "support": 83.0
+    },
+    "2": {
+      "precision": 0.75,
+      "recall": 0.6,
+      "f1-score": 0.6666666666666666,
+      "support": 5.0
+    },
+    "3": {
+      "precision": 0.9705882352941176,
+      "recall": 0.9428571428571428,
+      "f1-score": 0.9565217391304348,
+      "support": 35.0
+    },
+    "accuracy": 0.8524305555555556,
+    "macro avg": {
+      "precision": 0.7672257105089226,
+      "recall": 0.6417383820998279,
+      "f1-score": 0.6467746369976106,
+      "support": 576.0
+    },
+    "weighted avg": {
+      "precision": 0.8046998352243518,
+      "recall": 0.8524305555555556,
+      "f1-score": 0.7924503374368201,
+      "support": 576.0
+    }
+  }
+}

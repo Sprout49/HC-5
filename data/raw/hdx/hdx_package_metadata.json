@@ -1,0 +1,92 @@
+[
+  {
+    "id": "ce3efcd6-7a23-41c1-b463-5a46125b0bc5",
+    "name": "geoboundaries-admin-boundaries-for-india",
+    "title": "India - Subnational Administrative Boundaries",
+    "organization": "geoBoundaries",
+    "license_title": "Open Database License (ODC-ODbL)",
+    "url": "https://data.humdata.org/dataset/geoboundaries-admin-boundaries-for-india",
+    "resources_count": 20
+  },
+  {
+    "id": "81ac1d38-f603-4a98-804d-325c658599a3",
+    "name": "cod-ab-nga",
+    "title": "Nigeria - Subnational Administrative Boundaries",
+    "organization": "OCHA Field Information Services Section (FISS)",
+    "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+    "url": "https://data.humdata.org/dataset/cod-ab-nga",
+    "resources_count": 4
+  },
+  {
+    "id": "cb58fa1f-687d-4cac-81a7-655ab1efb2d0",
+    "name": "cod-ab-eth",
+    "title": "Ethiopia - Subnational Administrative Boundaries",
+    "organization": "OCHA Field Information Services Section (FISS)",
+    "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+    "url": "https://data.humdata.org/dataset/cod-ab-eth",
+    "resources_count": 4
+  },
+  {
+    "id": "d23f529f-31e4-4021-a65b-13987e5cfb42",
+    "name": "cod-ab-ukr",
+    "title": "Ukraine - Subnational Administrative Boundaries",
+    "organization": "OCHA Field Information Services Section (FISS)",
+    "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+    "url": "https://data.humdata.org/dataset/cod-ab-ukr",
+    "resources_count": 4
+  },
+  {
+    "id": "2c0b7571-4bef-4347-9b81-b2174c13f9ef",
+    "name": "cod-ab-ken",
+    "title": "Kenya - Subnational Administrative Boundaries",
+    "organization": "OCHA Field Information Services Section (FISS)",
+    "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+    "url": "https://data.humdata.org/dataset/cod-ab-ken",
+    "resources_count": 4
+  },
+  {
+    "id": "b90d81ba-7c7a-4283-9899-827480d80a79",
+    "name": "cod-ab-egy",
+    "title": "Egypt - Subnational Administrative Boundaries",
+    "organization": "OCHA Field Information Services Section (FISS)",
+    "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+    "url": "https://data.humdata.org/dataset/cod-ab-egy",
+    "resources_count": 4
+  },
+  {
+    "id": "07db728a-4f0f-4e98-8eb0-8fa9df61f01c",
+    "name": "cod-ab-npl",
+    "title": "Nepal - Subnational Administrative Boundaries",
+    "organization": "OCHA Field Information Services Section (FISS)",
+    "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+    "url": "https://data.humdata.org/dataset/cod-ab-npl",
+    "resources_count": 4
+  },
+  {
+    "id": "6b2656e2-b915-4671-bfed-468d5edcd80a",
+    "name": "cod-ab-yem",
+    "title": "Yemen - Subnational Administrative Boundaries",
+    "organization": "OCHA Field Information Services Section (FISS)",
+    "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+    "url": "https://data.humdata.org/dataset/cod-ab-yem",
+    "resources_count": 4
+  },
+  {
+    "id": "5e8d83a5-1210-49be-b7d9-cf286dbc15df",
+    "name": "cod-ab-moz",
+    "title": "Mozambique - Subnational Administrative Boundaries",
+    "organization": "OCHA Field Information Services Section (FISS)",
+    "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+    "url": "https://data.humdata.org/dataset/cod-ab-moz",
+    "resources_count": 4
+  },
+  {
+    "id": "17a2aaa2-dea9-4a2e-8b3f-92d1bdfb850c",
+    "name": "cod-ab-chn",
+    "title": "China - Subnational Administrative Boundaries",
+    "organization": "OCHA Regional Office for Asia and the Pacific (ROAP)",
+    "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+    "url": "https://data.humdata.org/dataset/cod-ab-chn",
+    "resources_count": 4
+  }
+]

@@ -1,0 +1,181 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "HOSP_SASSOON",
+        "name": "Sassoon General Hospital & BJ Medical College",
+        "total_beds": 1200,
+        "available_beds": 216,
+        "total_icu": 60,
+        "available_icu": 12,
+        "has_trauma_center": true,
+        "trauma_center": true,
+        "address": "Pune Urban Center, Maharashtra",
+        "phone": "+91 20 2612 8000"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8744,
+          18.5284
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "HOSP_KEM",
+        "name": "KEM Hospital Pune (Rasta Peth)",
+        "total_beds": 550,
+        "available_beds": 99,
+        "total_icu": 35,
+        "available_icu": 7,
+        "has_trauma_center": true,
+        "trauma_center": true,
+        "address": "Pune Urban Center, Maharashtra",
+        "phone": "+91 20 2612 8000"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8682,
+          18.5218
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "HOSP_RUBY",
+        "name": "Ruby Hall Clinic (Sangamvadi)",
+        "total_beds": 600,
+        "available_beds": 108,
+        "total_icu": 45,
+        "available_icu": 9,
+        "has_trauma_center": true,
+        "trauma_center": true,
+        "address": "Pune Urban Center, Maharashtra",
+        "phone": "+91 20 2612 8000"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8812,
+          18.5342
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "HOSP_JEHANGIR",
+        "name": "Jehangir Hospital (Near Station)",
+        "total_beds": 350,
+        "available_beds": 63,
+        "total_icu": 25,
+        "available_icu": 5,
+        "has_trauma_center": true,
+        "trauma_center": true,
+        "address": "Pune Urban Center, Maharashtra",
+        "phone": "+91 20 2612 8000"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8778,
+          18.5315
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "HOSP_SANCHETI",
+        "name": "Sancheti Hospital (Orthopedic Trauma Center)",
+        "total_beds": 200,
+        "available_beds": 36,
+        "total_icu": 18,
+        "available_icu": 3,
+        "has_trauma_center": true,
+        "trauma_center": true,
+        "address": "Pune Urban Center, Maharashtra",
+        "phone": "+91 20 2612 8000"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8512,
+          18.5312
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "HOSP_DEENANATH",
+        "name": "Deenanath Mangeshkar Hospital (Erandwane)",
+        "total_beds": 800,
+        "available_beds": 144,
+        "total_icu": 50,
+        "available_icu": 10,
+        "has_trauma_center": true,
+        "trauma_center": true,
+        "address": "Pune Urban Center, Maharashtra",
+        "phone": "+91 20 2612 8000"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.829,
+          18.5035
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "HOSP_CANTONMENT",
+        "name": "Pune Cantonment General Hospital",
+        "total_beds": 180,
+        "available_beds": 32,
+        "total_icu": 10,
+        "available_icu": 2,
+        "has_trauma_center": false,
+        "trauma_center": false,
+        "address": "Pune Urban Center, Maharashtra",
+        "phone": "+91 20 2612 8000"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8825,
+          18.5142
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "HOSP_INLAKS",
+        "name": "Inlaks and Budhrani Hospital (Koregaon Park)",
+        "total_beds": 250,
+        "available_beds": 45,
+        "total_icu": 15,
+        "available_icu": 3,
+        "has_trauma_center": false,
+        "trauma_center": false,
+        "address": "Pune Urban Center, Maharashtra",
+        "phone": "+91 20 2612 8000"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8965,
+          18.5365
+        ]
+      }
+    }
+  ]
+}

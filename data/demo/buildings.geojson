@@ -1,0 +1,1263 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_001",
+        "name": "Sassoon Trauma Block",
+        "height": 34,
+        "base_height": 0,
+        "color": "#f8fafc"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.87379999999999,
+              18.528000000000002
+            ],
+            [
+              73.875,
+              18.528000000000002
+            ],
+            [
+              73.875,
+              18.5288
+            ],
+            [
+              73.87379999999999,
+              18.5288
+            ],
+            [
+              73.87379999999999,
+              18.528000000000002
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_002",
+        "name": "BJ Govt Medical College",
+        "height": 28,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8727,
+              18.52715
+            ],
+            [
+              73.8737,
+              18.52715
+            ],
+            [
+              73.8737,
+              18.52805
+            ],
+            [
+              73.8727,
+              18.52805
+            ],
+            [
+              73.8727,
+              18.52715
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_003",
+        "name": "Pune Central Station Terminal",
+        "height": 22,
+        "base_height": 0,
+        "color": "#e2e8f0"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8729,
+              18.52945
+            ],
+            [
+              73.87509999999999,
+              18.52945
+            ],
+            [
+              73.87509999999999,
+              18.530150000000003
+            ],
+            [
+              73.8729,
+              18.530150000000003
+            ],
+            [
+              73.8729,
+              18.52945
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_004",
+        "name": "Ruby Hall Medical Tower",
+        "height": 38,
+        "base_height": 0,
+        "color": "#f8fafc"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.88154999999999,
+              18.5338
+            ],
+            [
+              73.88265,
+              18.5338
+            ],
+            [
+              73.88265,
+              18.534599999999998
+            ],
+            [
+              73.88154999999999,
+              18.534599999999998
+            ],
+            [
+              73.88154999999999,
+              18.5338
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_005",
+        "name": "Jehangir Hospital Wing",
+        "height": 26,
+        "base_height": 0,
+        "color": "#f8fafc"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.88075,
+              18.53275
+            ],
+            [
+              73.88165000000001,
+              18.53275
+            ],
+            [
+              73.88165000000001,
+              18.533450000000002
+            ],
+            [
+              73.88075,
+              18.533450000000002
+            ],
+            [
+              73.88075,
+              18.53275
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_006",
+        "name": "COEP Heritage Main Building",
+        "height": 24,
+        "base_height": 0,
+        "color": "#e2e8f0"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8558,
+              18.5285
+            ],
+            [
+              73.85719999999999,
+              18.5285
+            ],
+            [
+              73.85719999999999,
+              18.5295
+            ],
+            [
+              73.8558,
+              18.5295
+            ],
+            [
+              73.8558,
+              18.5285
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_007",
+        "name": "COEP Academic Complex",
+        "height": 30,
+        "base_height": 0,
+        "color": "#cbd5e1"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.85719999999999,
+              18.5298
+            ],
+            [
+              73.8584,
+              18.5298
+            ],
+            [
+              73.8584,
+              18.5306
+            ],
+            [
+              73.85719999999999,
+              18.5306
+            ],
+            [
+              73.85719999999999,
+              18.5298
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_008",
+        "name": "Sancheti Orthopedic Center",
+        "height": 32,
+        "base_height": 0,
+        "color": "#f8fafc"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.85075,
+              18.5308
+            ],
+            [
+              73.85165,
+              18.5308
+            ],
+            [
+              73.85165,
+              18.531599999999997
+            ],
+            [
+              73.85075,
+              18.531599999999997
+            ],
+            [
+              73.85075,
+              18.5308
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_009",
+        "name": "Shaniwar Wada Historic Fort",
+        "height": 18,
+        "base_height": 0,
+        "color": "#94a3b8"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8542,
+              18.518800000000002
+            ],
+            [
+              73.8558,
+              18.518800000000002
+            ],
+            [
+              73.8558,
+              18.5202
+            ],
+            [
+              73.8542,
+              18.5202
+            ],
+            [
+              73.8542,
+              18.518800000000002
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_010",
+        "name": "Fergusson College Main Quad",
+        "height": 20,
+        "base_height": 0,
+        "color": "#cbd5e1"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8436,
+              18.5284
+            ],
+            [
+              73.8454,
+              18.5284
+            ],
+            [
+              73.8454,
+              18.5296
+            ],
+            [
+              73.8436,
+              18.5296
+            ],
+            [
+              73.8436,
+              18.5284
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_011",
+        "name": "Deccan Gymkhana Pavilion",
+        "height": 16,
+        "base_height": 0,
+        "color": "#cbd5e1"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8384,
+              18.5165
+            ],
+            [
+              73.8396,
+              18.5165
+            ],
+            [
+              73.8396,
+              18.5175
+            ],
+            [
+              73.8384,
+              18.5175
+            ],
+            [
+              73.8384,
+              18.5165
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_012",
+        "name": "KEM Hospital Rasta Peth Tower",
+        "height": 36,
+        "base_height": 0,
+        "color": "#f8fafc"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8671,
+              18.52045
+            ],
+            [
+              73.8683,
+              18.52045
+            ],
+            [
+              73.8683,
+              18.52135
+            ],
+            [
+              73.8671,
+              18.52135
+            ],
+            [
+              73.8671,
+              18.52045
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_013",
+        "name": "Swargate Transit Hub Complex",
+        "height": 26,
+        "base_height": 0,
+        "color": "#cbd5e1"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8562,
+              18.500400000000003
+            ],
+            [
+              73.8578,
+              18.500400000000003
+            ],
+            [
+              73.8578,
+              18.5016
+            ],
+            [
+              73.8562,
+              18.5016
+            ],
+            [
+              73.8562,
+              18.500400000000003
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_014",
+        "name": "Deenanath Mangeshkar Hospital",
+        "height": 42,
+        "base_height": 0,
+        "color": "#f8fafc"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.82825,
+              18.50225
+            ],
+            [
+              73.82974999999999,
+              18.50225
+            ],
+            [
+              73.82974999999999,
+              18.50335
+            ],
+            [
+              73.82825,
+              18.50335
+            ],
+            [
+              73.82825,
+              18.50225
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_015",
+        "name": "Koregaon Park Tech Cluster A",
+        "height": 35,
+        "base_height": 0,
+        "color": "#e2e8f0"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8954,
+              18.5361
+            ],
+            [
+              73.8966,
+              18.5361
+            ],
+            [
+              73.8966,
+              18.5369
+            ],
+            [
+              73.8954,
+              18.5369
+            ],
+            [
+              73.8954,
+              18.5361
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_016",
+        "name": "Koregaon Park Tech Cluster B",
+        "height": 30,
+        "base_height": 0,
+        "color": "#cbd5e1"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.898,
+              18.536849999999998
+            ],
+            [
+              73.899,
+              18.536849999999998
+            ],
+            [
+              73.899,
+              18.53755
+            ],
+            [
+              73.898,
+              18.53755
+            ],
+            [
+              73.898,
+              18.536849999999998
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_017",
+        "name": "Yerawada Civic Complex",
+        "height": 22,
+        "base_height": 0,
+        "color": "#cbd5e1"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8803,
+              18.54855
+            ],
+            [
+              73.8817,
+              18.54855
+            ],
+            [
+              73.8817,
+              18.54945
+            ],
+            [
+              73.8803,
+              18.54945
+            ],
+            [
+              73.8803,
+              18.54855
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_018",
+        "name": "Camp Commercial Center",
+        "height": 24,
+        "base_height": 0,
+        "color": "#e2e8f0"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.87525000000001,
+              18.5145
+            ],
+            [
+              73.87675,
+              18.5145
+            ],
+            [
+              73.87675,
+              18.5155
+            ],
+            [
+              73.87525000000001,
+              18.5155
+            ],
+            [
+              73.87525000000001,
+              18.5145
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_019",
+        "name": "Urban Block UB-01",
+        "height": 14,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.83380000000001,
+              18.5021
+            ],
+            [
+              73.83460000000001,
+              18.5021
+            ],
+            [
+              73.83460000000001,
+              18.502699999999997
+            ],
+            [
+              73.83380000000001,
+              18.502699999999997
+            ],
+            [
+              73.83380000000001,
+              18.5021
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_020",
+        "name": "Urban Block UB-02",
+        "height": 17,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.84880000000001,
+              18.5021
+            ],
+            [
+              73.84960000000001,
+              18.5021
+            ],
+            [
+              73.84960000000001,
+              18.502699999999997
+            ],
+            [
+              73.84880000000001,
+              18.502699999999997
+            ],
+            [
+              73.84880000000001,
+              18.5021
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_021",
+        "name": "Urban Block UB-03",
+        "height": 20,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8638,
+              18.5021
+            ],
+            [
+              73.8646,
+              18.5021
+            ],
+            [
+              73.8646,
+              18.502699999999997
+            ],
+            [
+              73.8638,
+              18.502699999999997
+            ],
+            [
+              73.8638,
+              18.5021
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_022",
+        "name": "Urban Block UB-04",
+        "height": 23,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8788,
+              18.5021
+            ],
+            [
+              73.8796,
+              18.5021
+            ],
+            [
+              73.8796,
+              18.502699999999997
+            ],
+            [
+              73.8788,
+              18.502699999999997
+            ],
+            [
+              73.8788,
+              18.5021
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_023",
+        "name": "Urban Block UB-05",
+        "height": 26,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.83380000000001,
+              18.5141
+            ],
+            [
+              73.83460000000001,
+              18.5141
+            ],
+            [
+              73.83460000000001,
+              18.514699999999998
+            ],
+            [
+              73.83380000000001,
+              18.514699999999998
+            ],
+            [
+              73.83380000000001,
+              18.5141
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_024",
+        "name": "Urban Block UB-06",
+        "height": 29,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.84880000000001,
+              18.5141
+            ],
+            [
+              73.84960000000001,
+              18.5141
+            ],
+            [
+              73.84960000000001,
+              18.514699999999998
+            ],
+            [
+              73.84880000000001,
+              18.514699999999998
+            ],
+            [
+              73.84880000000001,
+              18.5141
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_025",
+        "name": "Urban Block UB-07",
+        "height": 32,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8638,
+              18.5141
+            ],
+            [
+              73.8646,
+              18.5141
+            ],
+            [
+              73.8646,
+              18.514699999999998
+            ],
+            [
+              73.8638,
+              18.514699999999998
+            ],
+            [
+              73.8638,
+              18.5141
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_026",
+        "name": "Urban Block UB-08",
+        "height": 35,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8788,
+              18.5141
+            ],
+            [
+              73.8796,
+              18.5141
+            ],
+            [
+              73.8796,
+              18.514699999999998
+            ],
+            [
+              73.8788,
+              18.514699999999998
+            ],
+            [
+              73.8788,
+              18.5141
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_027",
+        "name": "Urban Block UB-09",
+        "height": 38,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.83380000000001,
+              18.5261
+            ],
+            [
+              73.83460000000001,
+              18.5261
+            ],
+            [
+              73.83460000000001,
+              18.526699999999998
+            ],
+            [
+              73.83380000000001,
+              18.526699999999998
+            ],
+            [
+              73.83380000000001,
+              18.5261
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_028",
+        "name": "Urban Block UB-10",
+        "height": 16,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.84880000000001,
+              18.5261
+            ],
+            [
+              73.84960000000001,
+              18.5261
+            ],
+            [
+              73.84960000000001,
+              18.526699999999998
+            ],
+            [
+              73.84880000000001,
+              18.526699999999998
+            ],
+            [
+              73.84880000000001,
+              18.5261
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_029",
+        "name": "Urban Block UB-11",
+        "height": 19,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8638,
+              18.5261
+            ],
+            [
+              73.8646,
+              18.5261
+            ],
+            [
+              73.8646,
+              18.526699999999998
+            ],
+            [
+              73.8638,
+              18.526699999999998
+            ],
+            [
+              73.8638,
+              18.5261
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_030",
+        "name": "Urban Block UB-12",
+        "height": 22,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8788,
+              18.5261
+            ],
+            [
+              73.8796,
+              18.5261
+            ],
+            [
+              73.8796,
+              18.526699999999998
+            ],
+            [
+              73.8788,
+              18.526699999999998
+            ],
+            [
+              73.8788,
+              18.5261
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_031",
+        "name": "Urban Block UB-13",
+        "height": 25,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.83380000000001,
+              18.5381
+            ],
+            [
+              73.83460000000001,
+              18.5381
+            ],
+            [
+              73.83460000000001,
+              18.5387
+            ],
+            [
+              73.83380000000001,
+              18.5387
+            ],
+            [
+              73.83380000000001,
+              18.5381
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_032",
+        "name": "Urban Block UB-14",
+        "height": 28,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.84880000000001,
+              18.5381
+            ],
+            [
+              73.84960000000001,
+              18.5381
+            ],
+            [
+              73.84960000000001,
+              18.5387
+            ],
+            [
+              73.84880000000001,
+              18.5387
+            ],
+            [
+              73.84880000000001,
+              18.5381
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_033",
+        "name": "Urban Block UB-15",
+        "height": 31,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8638,
+              18.5381
+            ],
+            [
+              73.8646,
+              18.5381
+            ],
+            [
+              73.8646,
+              18.5387
+            ],
+            [
+              73.8638,
+              18.5387
+            ],
+            [
+              73.8638,
+              18.5381
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLD_034",
+        "name": "Urban Block UB-16",
+        "height": 34,
+        "base_height": 0,
+        "color": "#f1f5f9"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8788,
+              18.5381
+            ],
+            [
+              73.8796,
+              18.5381
+            ],
+            [
+              73.8796,
+              18.5387
+            ],
+            [
+              73.8788,
+              18.5387
+            ],
+            [
+              73.8788,
+              18.5381
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

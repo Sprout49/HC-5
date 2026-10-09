@@ -1,0 +1,136 @@
+{
+  "project": "HC-05 Climate-Aware Emergency Response Network",
+  "study_area": "Pune Urban Area, Maharashtra, India",
+  "bounding_box": {
+    "south": 18.490,
+    "west": 73.810,
+    "north": 18.565,
+    "east": 73.925
+  },
+  "datasets": [
+    {
+      "dataset_name": "OpenStreetMap Pune Road Network",
+      "provider": "OpenStreetMap contributors / Humanitarian OpenStreetMap Team",
+      "source_url": "https://www.openstreetmap.org / Overpass API",
+      "download_date": "2026-10-09",
+      "original_filename": "pune_roads_raw.geojson",
+      "local_raw_path": "data/raw/osm/pune_roads_raw.geojson",
+      "processed_path": "data/processed/roads.geojson",
+      "license": "Open Data Commons Open Database License (ODbL) 1.0",
+      "attribution": "© OpenStreetMap contributors",
+      "features_count": 8570,
+      "fields_used": [
+        "osm_id", "highway", "name", "geometry", "oneway", "maxspeed", "bridge", "tunnel", "surface"
+      ],
+      "preprocessing": "Clipped to Pune bounding box, topology extraction, metric length calculation in UTM Zone 43N (EPSG:32643), node intersection indexing, DEM elevation sampling",
+      "data_category": "REAL_STATIC_GEOGRAPHY",
+      "acquisition_method": "Programmatic Overpass API Query"
+    },
+    {
+      "dataset_name": "OpenStreetMap Pune Waterways & Hydrography",
+      "provider": "OpenStreetMap contributors",
+      "source_url": "https://www.openstreetmap.org / Overpass API",
+      "download_date": "2026-10-09",
+      "original_filename": "pune_waterways_raw.geojson",
+      "local_raw_path": "data/raw/osm/pune_waterways_raw.geojson",
+      "processed_path": "data/processed/waterways.geojson",
+      "license": "Open Data Commons Open Database License (ODbL) 1.0",
+      "attribution": "© OpenStreetMap contributors",
+      "features_count": 119,
+      "fields_used": ["osm_id", "waterway", "natural", "name", "geometry"],
+      "preprocessing": "Channel centerline extraction for Mutha River, Mula River, and canal networks; polygonized basin corridors for flood propagation seeding",
+      "data_category": "REAL_STATIC_GEOGRAPHY",
+      "acquisition_method": "Programmatic Overpass API Query"
+    },
+    {
+      "dataset_name": "OpenStreetMap Pune Healthcare Facilities",
+      "provider": "OpenStreetMap contributors / Pune Municipal Corporation Directory",
+      "source_url": "https://www.openstreetmap.org / Overpass API",
+      "download_date": "2026-10-09",
+      "original_filename": "pune_hospitals_raw.geojson",
+      "local_raw_path": "data/raw/osm/pune_hospitals_raw.geojson",
+      "processed_path": "data/processed/hospitals.geojson",
+      "license": "Open Data Commons Open Database License (ODbL) 1.0",
+      "attribution": "© OpenStreetMap contributors / Municipal Health Dept",
+      "features_count": 514,
+      "fields_used": ["osm_id", "amenity", "name", "geometry", "healthcare"],
+      "preprocessing": "Filtered major regional trauma and multispecialty healthcare facilities; linked with baseline municipal bed and ICU capacity attributes",
+      "data_category": "REAL_STATIC_GEOGRAPHY",
+      "acquisition_method": "Programmatic Overpass API Query"
+    },
+    {
+      "dataset_name": "OpenStreetMap Pune Building Footprints",
+      "provider": "OpenStreetMap contributors",
+      "source_url": "https://www.openstreetmap.org / Overpass API",
+      "download_date": "2026-10-09",
+      "original_filename": "pune_buildings_raw.geojson",
+      "local_raw_path": "data/raw/osm/pune_buildings_raw.geojson",
+      "processed_path": "data/processed/buildings.geojson",
+      "license": "Open Data Commons Open Database License (ODbL) 1.0",
+      "attribution": "© OpenStreetMap contributors",
+      "features_count": 11299,
+      "fields_used": ["osm_id", "building", "building:levels", "height", "name", "geometry"],
+      "preprocessing": "Polygon validation, extrusion height assignment (levels * 3.5m or landmark heights 12m-42m), spatial indexing for flood obstacle exclusion",
+      "data_category": "REAL_STATIC_GEOGRAPHY",
+      "acquisition_method": "Programmatic Overpass API Query"
+    },
+    {
+      "dataset_name": "NASA/USGS SRTM Digital Elevation Model (DEM)",
+      "provider": "NASA / USGS / Open-Elevation API",
+      "source_url": "https://api.open-elevation.com/api/v1/lookup",
+      "download_date": "2026-10-09",
+      "original_filename": "pune_srtm_dem.tif",
+      "local_raw_path": "data/raw/dem/pune_srtm_dem.tif",
+      "processed_path": "data/processed/flood/elevation_grid.json",
+      "license": "Public Domain (NASA / USGS Open Data Policy)",
+      "attribution": "NASA JPL / USGS Shuttle Radar Topography Mission",
+      "spatial_resolution": "~150m cell spacing across 35x45 regular grid",
+      "fields_used": ["elevation_matrix", "min_elevation_m", "max_elevation_m", "crs", "transform"],
+      "preprocessing": "Grid sampling, GeoTIFF creation in EPSG:4326 via rasterio, elevation assignment to road vertices and urban administrative zones",
+      "data_category": "REAL_STATIC_GEOGRAPHY",
+      "acquisition_method": "Programmatic Elevation Grid API Extraction"
+    },
+    {
+      "dataset_name": "HDX India Subnational Population & Administrative Context",
+      "provider": "Humanitarian Data Exchange (HDX) / UN OCHA / Survey of India",
+      "source_url": "https://data.humdata.org/dataset/cod-ps-ind",
+      "download_date": "2026-10-09",
+      "original_filename": "pune_humanitarian_context.json",
+      "local_raw_path": "data/raw/hdx/pune_humanitarian_context.json",
+      "processed_path": "data/processed/zones.geojson",
+      "license": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+      "attribution": "UN OCHA / Survey of India / Humanitarian Data Exchange",
+      "fields_used": ["population", "vulnerability_index", "zone_name", "zone_id", "area_km2"],
+      "preprocessing": "Mapped to Pune municipal ward boundaries and urban sectors, baseline vulnerability and medical coverage initialization",
+      "data_category": "REAL_STATIC_GEOGRAPHY",
+      "acquisition_method": "HDX CKAN API Query"
+    }
+  ],
+  "simulated_dynamic_layers": [
+    {
+      "layer_name": "Flood Surface Inundation Extent",
+      "method": "DEM-based connected flood propagation from waterway seed cells using water stage elevation",
+      "data_category": "SIMULATED_DYNAMIC_STATE"
+    },
+    {
+      "layer_name": "Road Segment Dynamic Status",
+      "method": "Spatial intersection of processed road LineStrings with flood inundation surface (max_flood_depth_m, flooded_ratio)",
+      "data_category": "SIMULATED_DYNAMIC_STATE"
+    },
+    {
+      "layer_name": "Emergency Incidents",
+      "method": "Poisson call arrivals distributed by zone population density and flood exposure",
+      "data_category": "SIMULATED_DYNAMIC_STATE"
+    },
+    {
+      "layer_name": "Ambulance Routing & Positions",
+      "method": "NetworkX graph routing along real road segments with continuous GPS kinematic progression",
+      "data_category": "SIMULATED_DYNAMIC_STATE"
+    },
+    {
+      "layer_name": "Hospital Bed & ICU Admissions",
+      "method": "Dynamic decrements upon patient arrival based on clinical severity matching",
+      "data_category": "SIMULATED_DYNAMIC_STATE"
+    }
+  ]
+}
