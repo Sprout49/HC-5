@@ -1,5 +1,18 @@
 [
   {
+    "ambulance_id": "AMB-05",
+    "callsign": "Yerwada",
+    "type": "ALS",
+    "assigned_zone": "Z7",
+    "base_location": [
+      73.881,
+      18.549
+    ],
+    "speed_kmh": 45.0,
+    "patient_capacity": 2,
+    "password": "demo123"
+  },
+  {
     "ambulance_id": "AMB-01",
     "callsign": "Ambulance 01",
     "type": "ALS",
@@ -46,19 +59,6 @@
     "base_location": [
       73.8744,
       18.5284
-    ],
-    "speed_kmh": 45.0,
-    "patient_capacity": 2,
-    "password": "demo123"
-  },
-  {
-    "ambulance_id": "AMB-05",
-    "callsign": "Yerwada",
-    "type": "ALS",
-    "assigned_zone": "Z7",
-    "base_location": [
-      73.881,
-      18.549
     ],
     "speed_kmh": 45.0,
     "patient_capacity": 2,

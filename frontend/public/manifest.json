@@ -1,0 +1,16 @@
+﻿{
+  "name": "HC-05 Climate-Aware Disaster SOS",
+  "short_name": "Disaster SOS",
+  "description": "Offline-First Citizen Emergency SOS Beacon for Urban Floods",
+  "start_url": "/sos",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#ef4444",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

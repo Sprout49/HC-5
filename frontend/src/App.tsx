@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { SimulationProvider } from './context/SimulationContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { AmbulanceDashboard } from './pages/AmbulanceDashboard';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { AmbulanceLoginPage } from './pages/AmbulanceLoginPage';
+import { CitizenSOSPage } from './pages/CitizenSOSPage';
 
 function MainRouter() {
   const { isAdminLoggedIn, isAmbulanceLoggedIn } = useAuth();
@@ -22,6 +23,11 @@ function MainRouter() {
     window.history.pushState({}, '', path);
     setCurrentPath(path.toLowerCase());
   };
+
+  // 0. Public Citizen Emergency SOS Portal (Unguarded, Pre-Cached Way 2 PWA)
+  if (currentPath === '/sos' || currentPath.includes('/citizen')) {
+    return <CitizenSOSPage />;
+  }
 
   // 1. Ambulance Login Route
   if (currentPath.includes('/ambulance/login')) {

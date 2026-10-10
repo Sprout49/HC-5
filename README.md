@@ -188,6 +188,7 @@ py -3.11 -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
 
 ### Frontend Setup (React + Vite + MapLibre)
 ```bash
+
 cd frontend
 npm install
 npm run dev

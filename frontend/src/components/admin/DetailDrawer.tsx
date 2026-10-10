@@ -326,6 +326,27 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({ selectedObject, onCl
                 </div>
               )}
 
+              {(data.source || data.sender_name) && (
+                <div className="p-3 bg-emerald-50/90 rounded-2xl border border-emerald-200/80 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-600 text-white">
+                      {data.reported_via || (data.source === 'whatsapp' ? '📱 WhatsApp SOS' : data.source === 'telegram' ? '✈️ Telegram SOS' : '🌐 Citizen Portal')}
+                    </span>
+                    <span className="text-[11px] font-bold text-slate-800">{data.sender_name || 'Stranded Citizen'}</span>
+                  </div>
+                  {data.phone && (
+                    <div className="text-[11px] font-mono text-slate-600">
+                      📞 Contact: <strong className="text-slate-900">{data.phone}</strong>
+                    </div>
+                  )}
+                  {data.caller_notes && (
+                    <p className="text-[11px] text-slate-700 bg-white/80 p-2 rounded-xl border border-emerald-100">
+                      "{data.caller_notes}"
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
                   <span className="text-slate-400 block text-[10px] uppercase font-bold">Patients</span>

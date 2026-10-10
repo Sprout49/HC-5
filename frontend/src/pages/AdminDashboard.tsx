@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useSimulation } from '../context/SimulationContext';
 import { CityMap3D } from '../components/map/CityMap3D';
 import { DetailDrawer } from '../components/admin/DetailDrawer';
@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { CreateEmergencyModal } from '../components/admin/CreateEmergencyModal';
 import { AssumptionsModal } from '../components/admin/AssumptionsModal';
 import type { SeverityLevel, SimEvent } from '../types/simulation';
+import { motion } from 'framer-motion';
 import {
   Play,
   Pause,
@@ -23,7 +24,17 @@ import {
   LogOut,
   AlertTriangle,
   X,
+  MessageSquare,
+  ShieldAlert,
+  LifeBuoy,
 } from 'lucide-react';
+import { MeshRelayHUD } from '../components/emergency/MeshRelayHUD';
+import { TacticalRadioHUD } from '../components/emergency/TacticalRadioHUD';
+import { CitizenSOSModal } from '../components/emergency/CitizenSOSModal';
+import { CitizenPortalModal } from '../components/emergency/CitizenPortalModal';
+import { EvacuationBroadcastModal } from '../components/emergency/EvacuationBroadcastModal';
+import { EvacuationAlertBanner } from '../components/emergency/EvacuationAlertBanner';
+import { meshNetwork } from '../utils/meshNetwork';
 
 interface AdminDashboardProps {
   activeTab?: 'admin' | 'ambulance';
@@ -49,9 +60,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
   const [selectedObject, setSelectedObject] = useState<{ type: any; data: any } | null>(null);
   const [showAssumptions, setShowAssumptions] = useState(false);
   const [showFleetModal, setShowFleetModal] = useState(false);
+  const [showCitizenSOS, setShowCitizenSOS] = useState(false);
+  const [showCitizenPortal, setShowCitizenPortal] = useState(false);
+  const [showEvacModal, setShowEvacModal] = useState(false);
   const [floodRescueAlert, setFloodRescueAlert] = useState<SimEvent | null>(null);
   const lastFloodAlertKey = useRef<string | null>(null);
   const { adminUser, logoutAdmin } = useAuth();
+
+  useEffect(() => {
+    meshNetwork.registerLocalTab('HQ_RELAY', 'Admin Command HQ', 'WebRTC P2P');
+  }, []);
 
   useEffect(() => {
     const submergedEvent = state?.events.find(
@@ -79,9 +97,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden flex flex-col bg-slate-50 select-none">
+    <div className="relative w-screen h-screen overflow-hidden flex flex-col bg-slate-50 select-none font-sans">
       {/* 1. TOP HEADER & SIMULATION CONTROLS */}
-      <header className="h-16 px-6 bg-white/95 backdrop-blur-md border-b border-slate-200/90 flex items-center justify-between z-30 shadow-xs">
+      <motion.header 
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="h-16 px-4 bg-white/90 backdrop-blur-2xl border-b border-white flex items-center justify-between z-30 shadow-xs gap-2 shrink-0 overflow-x-auto no-scrollbar"
+      >
         {/* Left: Brand & Challenge */}
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-md">
@@ -95,7 +118,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
               </span>
             </div>
             <p className="text-[11px] text-slate-500 font-medium">
-              Climate-Aware Emergency Response Network • Pune Grid
+              Climate-Aware Emergency Response Network â€¢ Pune Grid
             </p>
           </div>
         </div>
@@ -124,7 +147,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
             <div className="text-right">
               <span className="block text-[10px] uppercase font-bold text-slate-400">Time</span>
               <span className="text-xs font-bold text-slate-800">
-                {state?.simulation_time_str || 'Day 1 • 14:00'}
+                {state?.simulation_time_str || 'Day 1 â€¢ 14:00'}
               </span>
             </div>
             <span
@@ -193,35 +216,71 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
         </div>
 
         {/* Right: Actions, Demo Button, Assumptions, and Dashboard Switcher */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={() => setIsCreateMode(!isCreateMode)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs transition-all ${
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-bold text-xs transition-all ${
               isCreateMode
                 ? 'bg-amber-500 text-white shadow-md ring-2 ring-amber-300'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
-            <PlusCircle className="w-4 h-4" />
-            <span>{isCreateMode ? 'Click Map...' : 'Report Incident'}</span>
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span>{isCreateMode ? 'Click Map' : 'Report'}</span>
           </button>
 
           <button
             onClick={loadDemoScenario}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md hover:shadow-lg transition-all"
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-xs transition-all"
             title="Load Pre-Seeded Hackathon Demo Scenario"
           >
-            <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>LOAD DEMO SCENARIO</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <span>Demo</span>
           </button>
 
           <button
             onClick={() => setShowFleetModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
             title="Manage Fleet, Commission/Decommission Vehicles and View Driver Logins"
           >
-            <AmbulanceIcon className="w-4 h-4 text-indigo-600" />
+            <AmbulanceIcon className="w-3.5 h-3.5 text-indigo-600" />
             <span>Fleet ({state?.ambulances?.length || 0})</span>
+          </button>
+
+          <div className="h-5 w-px bg-slate-200 mx-0.5" />
+
+          <MeshRelayHUD />
+
+          <button
+            onClick={() => setShowCitizenSOS(true)}
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
+            title="Incoming WhatsApp & Telegram Citizen SOS Stream"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+            <span>SOS Bot</span>
+            {(state?.recent_sos_messages?.length ?? 0) > 0 && (
+              <span className="w-4 h-4 rounded-full bg-emerald-600 text-white text-[9px] font-black flex items-center justify-center">
+                {state?.recent_sos_messages?.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setShowEvacModal(true)}
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
+            title="Dispatch Geo-Fenced Reverse-911 Evacuation Warning"
+          >
+            <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
+            <span>Evacuation</span>
+          </button>
+
+          <button
+            onClick={() => window.open('/sos', '_blank')}
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
+            title="Open Pre-Cached Citizen Offline SOS Portal (/sos) in New Window"
+          >
+            <LifeBuoy className="w-3.5 h-3.5 text-sky-600" />
+            <span>Citizen SOS (/sos)</span>
           </button>
 
           <button
@@ -229,10 +288,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
             className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
             title="View Simulation Assumptions"
           >
-            <HelpCircle className="w-4 h-4" />
+            <HelpCircle className="w-3.5 h-3.5" />
           </button>
 
-                    {/* Admin Profile & Logout */}
+          {/* Admin Profile & Logout */}
           <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 rounded-lg text-xs font-bold text-slate-700">
               <Shield className="w-3.5 h-3.5 text-blue-600" />
@@ -278,7 +337,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
             </div>
           )}
         </div>
-      </header>
+      </motion.header>
+
+      {/* Emergency Evacuation Broadcast Alert Banner */}
+      <EvacuationAlertBanner evacuations={state?.active_evacuations} isAdmin={true} />
 
       {/* 2. MAIN 3D MAP CANVAS */}
       <main className="flex-1 relative w-full h-full">
@@ -291,7 +353,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
         {/* Floating Incident Creation Prompt Banner */}
         {isCreateMode && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 px-4 py-2 bg-amber-500 text-white rounded-full shadow-2xl animate-pulse border-2 border-white">
-            <span className="text-sm">🎯</span>
+            <span className="text-sm">ðŸŽ¯</span>
             <span className="text-xs font-bold tracking-wide">CLICK ANYWHERE ON THE MAP TO REPORT EMERGENCY</span>
             <button
               onClick={() => setIsCreateMode(false)}
@@ -303,15 +365,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
         )}
 
         {/* FLOATING LEFT METRICS PANEL */}
-        <div className="absolute top-4 left-4 flex flex-col gap-3 z-20 pointer-events-none">
+        <motion.div 
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+          className="absolute top-20 left-4 flex flex-col gap-4 z-20 pointer-events-none max-h-[calc(100vh-140px)] overflow-y-auto no-scrollbar pb-8 hidden md:flex"
+        >
           {/* Flood Status Card */}
-          <div className="w-72 glass-panel p-4 rounded-2xl pointer-events-auto">
+          <motion.div whileHover={{ scale: 1.02 }} className="w-80 glass-panel p-5 pointer-events-auto">
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 Flood Hazard Status
               </span>
               <span className="text-xs font-bold text-blue-600 flex items-center gap-1">
-                <span>🌊</span>
+                <span>ðŸŒŠ</span>
                 <span>+{state?.water_rise_m.toFixed(2) || '0.00'}m</span>
               </span>
             </div>
@@ -329,10 +396,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
                 </span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Road Network State Card */}
-          <div className="w-72 glass-panel p-4 rounded-2xl pointer-events-auto">
+          <motion.div whileHover={{ scale: 1.02 }} className="w-80 glass-panel p-5 pointer-events-auto">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">
               Road Accessibility Network
             </span>
@@ -362,10 +429,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
                 </span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* ML Emergency Demand Forecast Card */}
-          <div className="w-72 glass-panel p-4 rounded-2xl pointer-events-auto">
+          <motion.div whileHover={{ scale: 1.02 }} className="w-80 glass-panel p-5 pointer-events-auto">
             <div className="flex items-center justify-between mb-1">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 Predicted Demand (ML)
@@ -381,13 +448,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
             <p className="text-[10px] text-slate-500 mt-1">
               RandomForest inference updating continuously across 8 urban zones
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* FLOATING RIGHT STATUS PANEL */}
-        <div className="absolute top-4 right-16 flex flex-col gap-3 z-20 pointer-events-none">
+        <motion.div 
+          initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+          className="absolute top-20 right-4 lg:right-6 flex flex-col gap-4 z-20 pointer-events-none max-h-[calc(100vh-140px)] overflow-y-auto no-scrollbar pb-8 hidden lg:flex"
+        >
           {/* Hospital Fleet Capacity */}
-          <div className="w-80 glass-panel p-4 rounded-2xl pointer-events-auto">
+          <motion.div whileHover={{ scale: 1.02 }} className="w-80 lg:w-96 glass-panel p-5 pointer-events-auto">
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 Hospital Network Load
@@ -421,10 +493,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Active Emergencies Tracker */}
-          <div className="w-80 glass-panel p-4 rounded-2xl pointer-events-auto">
+          <motion.div whileHover={{ scale: 1.02 }} className="w-80 lg:w-96 glass-panel p-5 pointer-events-auto">
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 Active Emergencies
@@ -449,9 +521,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
                                        isPredicted ? 'bg-rose-100 text-rose-800 border-rose-200' :
                                        isTrapped ? 'bg-red-100 text-red-800 border-red-300 animate-pulse' :
                                        'bg-white text-slate-700 border-slate-200';
-                    const badgeText = isSubmerged ? '🚤 SUBMERGED (BOAT EVAC)' :
-                                      isPredicted ? '⚠️ FLOOD CUTOFF' :
-                                      isTrapped ? '🆘 AMB TRAPPED' :
+                    const badgeText = isSubmerged ? 'ðŸš¤ SUBMERGED (BOAT EVAC)' :
+                                      isPredicted ? 'âš ï¸ FLOOD CUTOFF' :
+                                      isTrapped ? 'ðŸ†˜ AMB TRAPPED' :
                                       (inc.assigned_ambulance_id || 'DISPATCHING');
                     return (
                       <div
@@ -477,13 +549,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
                   })
               )}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* BOTTOM FLOATING SYSTEM ACTIONS & EVENT STREAM */}
-        <div className="absolute bottom-4 left-4 right-4 z-20 flex gap-4 pointer-events-none">
+        <motion.div 
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+          className="absolute bottom-4 left-4 right-4 z-20 flex flex-col lg:flex-row gap-4 pointer-events-none"
+        >
           {/* Action Recommendations Card */}
-          <div className="flex-1 glass-panel p-3.5 rounded-2xl pointer-events-auto shadow-xl">
+          <motion.div whileHover={{ y: -2 }} className="flex-1 glass-panel p-5 pointer-events-auto shadow-2xl">
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-blue-600" />
@@ -516,7 +593,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
                       onClick={() => deployMedicalCamp(rec.zone_id)}
                       className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow hover:shadow-md transition-all whitespace-nowrap"
                     >
-                      🏕️ {rec.action_label}
+                      ðŸ•ï¸ {rec.action_label}
                     </button>
                   </div>
                 ))}
@@ -525,14 +602,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
               <div className="flex items-center justify-between text-xs text-slate-500 py-1">
                 <span>All zone healthcare corridors and emergency dispatches currently optimal.</span>
                 <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
-                  <span>✓</span> No active gaps
+                  <span>âœ“</span> No active gaps
                 </span>
               </div>
             )}
-          </div>
+          </motion.div>
 
           {/* Event Stream Card */}
-          <div className="w-96 glass-panel p-3.5 rounded-2xl pointer-events-auto shadow-xl">
+          <motion.div whileHover={{ y: -2 }} className="w-full lg:w-[450px] glass-panel p-5 pointer-events-auto shadow-2xl">
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                 <Activity className="w-3.5 h-3.5 text-slate-700" />
@@ -562,8 +639,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
                 </div>
               ))}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </main>
 
       {/* 3. MODALS & DRAWERS */}
@@ -648,6 +725,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
           </section>
         </div>
       )}
+
+      {/* TACTICAL PUSH-TO-TALK WEBRTC RADIO */}
+      <TacticalRadioHUD userRole="ADMIN" callsign="DISPATCH HQ" />
+
+      {/* CITIZEN SOS BOT & INCOMING DISTRESS FEED MODAL */}
+      <CitizenSOSModal
+        isOpen={showCitizenSOS}
+        onClose={() => setShowCitizenSOS(false)}
+        recentMessages={state?.recent_sos_messages}
+      />
+
+      {/* PUBLIC CITIZEN FLOOD RESCUE PORTAL MODAL */}
+      <CitizenPortalModal
+        isOpen={showCitizenPortal}
+        onClose={() => setShowCitizenPortal(false)}
+      />
+
+      {/* GEO-FENCED REVERSE-911 EVACUATION BROADCAST MODAL */}
+      <EvacuationBroadcastModal
+        isOpen={showEvacModal}
+        onClose={() => setShowEvacModal(false)}
+      />
     </div>
   );
 };

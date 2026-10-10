@@ -1,9 +1,11 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f172a" />
     <meta name="description" content="HC-05 Climate-Aware Emergency Response Network — IFRC Flood Disaster Strategy & Navigation Simulation" />
+    <link rel="manifest" href="/manifest.json" />
     <title>HC-05 — Climate-Aware Emergency Response Network</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,5 +14,14 @@
   <body class="bg-slate-50 text-slate-900 antialiased overflow-hidden">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
+            .then((reg) => reg.update())
+            .catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>

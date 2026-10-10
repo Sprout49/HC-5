@@ -11,8 +11,15 @@ import {
   Check,
   LogOut,
   Shield,
+  MessageSquare,
 } from 'lucide-react';
 import { GoogleMapsNavHUD } from '../components/ambulance/GoogleMapsNavHUD';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MeshRelayHUD } from '../components/emergency/MeshRelayHUD';
+import { TacticalRadioHUD } from '../components/emergency/TacticalRadioHUD';
+import { EvacuationAlertBanner } from '../components/emergency/EvacuationAlertBanner';
+import { CitizenSOSModal } from '../components/emergency/CitizenSOSModal';
+import { meshNetwork } from '../utils/meshNetwork';
 
 interface AmbulanceDashboardProps {
   activeTab?: 'admin' | 'ambulance';
@@ -22,13 +29,29 @@ interface AmbulanceDashboardProps {
 export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
   const { state, acceptCall, pickupPatient, startHospitalRoute } = useSimulation();
   const { ambulanceUser, logoutAmbulance } = useAuth();
-  const activeAmbulanceId = ambulanceUser?.ambulance_id || 'AMB-01';
+  
+  // Flexible vehicle selector supporting URL query e.g. /ambulance?id=AMB-02 or user session
+  const queryParamAmb = typeof window !== 'undefined' 
+    ? new URLSearchParams(window.location.search).get('id') || new URLSearchParams(window.location.search).get('amb')
+    : null;
+    
+  const [selectedAmbulanceId, setSelectedAmbulanceId] = useState<string>(() => {
+    return queryParamAmb ? queryParamAmb.toUpperCase() : (ambulanceUser?.ambulance_id || 'AMB-01');
+  });
+  
+  const activeAmbulanceId = selectedAmbulanceId;
 
   // Live Hardware GPS Telemetry State (for Judge Demonstration)
   const [useRealGps, setUseRealGps] = useState(false);
   const [deviceGpsCoords, setDeviceGpsCoords] = useState<[number, number] | null>(null);
   const [gpsAccuracy, setGpsAccuracy] = useState<number | null>(null);
   const [gpsError, setGpsError] = useState<string | null>(null);
+  const [showCitizenSOS, setShowCitizenSOS] = useState(false);
+
+  // Register this ambulance terminal tab in the mesh network
+  useEffect(() => {
+    meshNetwork.registerLocalTab('AMBULANCE', `Ambulance ${activeAmbulanceId}`, 'HC-05 BT SPP');
+  }, [activeAmbulanceId]);
 
   useEffect(() => {
     if (!useRealGps) {
@@ -70,16 +93,38 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
   return (
     <div className="relative w-screen h-screen overflow-hidden flex flex-col bg-slate-100 select-none">
       {/* 1. TOP STATUS BAR */}
-      <header className="h-16 px-6 bg-white/95 backdrop-blur-md border-b border-slate-200/90 flex items-center justify-between z-30 shadow-xs">
+      <motion.header 
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="h-16 px-6 bg-white/80 backdrop-blur-2xl border-b border-white flex items-center justify-between z-30 shadow-sm"
+      >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-xl shadow-md">
+          <motion.div whileHover={{ scale: 1.05 }} className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-xl shadow-md">
             🚑
-          </div>
+          </motion.div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="font-extrabold text-slate-900 text-sm tracking-tight">
-                {currentAmbulance?.ambulance_id} ({currentAmbulance?.type})
-              </h2>
+              <select
+                value={activeAmbulanceId}
+                onChange={(e) => {
+                  setSelectedAmbulanceId(e.target.value);
+                  const newUrl = `${window.location.pathname}?id=${e.target.value}`;
+                  window.history.replaceState({}, '', newUrl);
+                }}
+                className="bg-slate-900 hover:bg-slate-800 text-white font-black text-xs px-2.5 py-1 rounded-xl shadow-xs border border-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                title="Switch Vehicle Unit for this Tab"
+              >
+                {state?.ambulances && state.ambulances.length > 0 ? (
+                  state.ambulances.map((amb) => (
+                    <option key={amb.ambulance_id} value={amb.ambulance_id}>
+                      {amb.ambulance_id} ({amb.type})
+                    </option>
+                  ))
+                ) : (
+                  <option value={activeAmbulanceId}>{activeAmbulanceId}</option>
+                )}
+              </select>
               <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping" />
                 {currentAmbulance?.status.replace(/_/g, ' ') || 'ONLINE'}
@@ -107,6 +152,22 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
             <span>{useRealGps ? '?? LIVE DEVICE GPS FEED' : '??? GPS: Pune Sim Grid'}</span>
           </button>
 
+          <MeshRelayHUD />
+
+          <button
+            onClick={() => setShowCitizenSOS(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
+            title="View WhatsApp & Telegram Citizen SOS Feed"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+            <span>SOS Feed</span>
+            {(state?.recent_sos_messages?.length ?? 0) > 0 && (
+              <span className="w-4 h-4 rounded-full bg-emerald-600 text-white text-[9px] font-black flex items-center justify-center">
+                {state?.recent_sos_messages?.length}
+              </span>
+            )}
+          </button>
+
           <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200/80 rounded-xl">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs font-black text-emerald-950">
@@ -126,13 +187,22 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
             <span>End Shift / Sign Out</span>
           </button>
         </div>
-      </header>
+      </motion.header>
+
+      {/* Emergency Evacuation Broadcast Alert Banner */}
+      <EvacuationAlertBanner evacuations={state?.active_evacuations} isAdmin={false} />
 
       {/* 2. 3D NAVIGATION MAP CENTERED ON AMBULANCE */}
       <main className="flex-1 relative w-full h-full">
         {/* Live GPS Telemetry Stream Banner (For Judges) */}
+        <AnimatePresence>
         {useRealGps && (
-          <div className="absolute top-20 left-1/2 -translate-x-1/2 z-30 bg-slate-900/95 backdrop-blur-md border border-cyan-500/60 text-white px-5 py-3 rounded-2xl shadow-2xl flex flex-wrap items-center gap-4 animate-in slide-in-from-top-4 duration-200">
+          <motion.div 
+            initial={{ y: -50, opacity: 0, x: "-50%" }}
+            animate={{ y: 0, opacity: 1, x: "-50%" }}
+            exit={{ y: -50, opacity: 0, x: "-50%" }}
+            className="absolute top-20 left-1/2 z-30 bg-slate-900/80 backdrop-blur-2xl border border-cyan-500/60 text-white px-5 py-3 rounded-2xl shadow-2xl flex flex-wrap items-center gap-4"
+          >
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
               <span className="text-xs font-black text-cyan-400 tracking-wider uppercase">
@@ -161,8 +231,9 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
             >
               Return to Pune Flood Sim
             </button>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
 
         <CityMap3D
           focusAmbulanceId={activeAmbulanceId}
@@ -170,15 +241,21 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
         />
 
         {/* TURN-BY-TURN GOOGLE MAPS STYLE HUD (En Route / Relocating) */}
+        <AnimatePresence>
         {currentAmbulance?.active_route?.route_coordinates &&
           currentAmbulance.active_route.route_coordinates.length > 1 &&
           (currentAmbulance.status === 'EN_ROUTE_TO_PATIENT' ||
             currentAmbulance.status === 'EN_ROUTE_TO_HOSPITAL' ||
             currentAmbulance.status === 'RELOCATING_TO_SAFETY' ||
             (currentAmbulance.route_progress || 0) > 0) && (
-            <div className={`absolute left-1/2 -translate-x-1/2 w-full max-w-xl px-4 z-20 pointer-events-auto transition-all ${
-              useRealGps ? 'top-32' : 'top-4'
-            }`}>
+            <motion.div 
+              initial={{ y: -20, opacity: 0, x: "-50%" }}
+              animate={{ y: 0, opacity: 1, x: "-50%" }}
+              exit={{ y: -20, opacity: 0, x: "-50%" }}
+              className={`absolute left-1/2 w-full max-w-xl px-4 z-20 pointer-events-auto transition-all ${
+                useRealGps ? 'top-32' : 'top-4'
+              }`}
+            >
               <GoogleMapsNavHUD
                 activeRoute={currentAmbulance.active_route.route_coordinates}
                 routeProgress={currentAmbulance.route_progress || 0}
@@ -195,12 +272,18 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
                 status={currentAmbulance.status}
                 isTrapped={currentAmbulance.is_trapped || currentAmbulance.status === 'TRAPPED_IN_FLOOD'}
               />
-            </div>
+            </motion.div>
           )}
+        </AnimatePresence>
 
         {/* FLOATING NAVIGATION CARD AT BOTTOM */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-xl px-4 z-20 pointer-events-none">
-          <div className="glass-panel p-5 rounded-3xl shadow-2xl border border-slate-200 pointer-events-auto">
+        <motion.div 
+          initial={{ y: 100, opacity: 0, x: "-50%" }}
+          animate={{ y: 0, opacity: 1, x: "-50%" }}
+          transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+          className="absolute bottom-6 left-1/2 w-full max-w-xl px-4 z-20 pointer-events-none"
+        >
+          <motion.div whileHover={{ y: -2 }} className="glass-panel p-6 rounded-[2rem] shadow-2xl border border-white/60 pointer-events-auto bg-white/70 backdrop-blur-2xl">
             {/* STATE 1: AVAILABLE / STANDBY */}
             {(!currentAmbulance || currentAmbulance.status === 'AVAILABLE' || currentAmbulance.status === 'COMPLETED') && (
               <div className="text-center py-3">
@@ -566,9 +649,22 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
                 </div>
               </div>
             )}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </main>
+
+      {/* TACTICAL PUSH-TO-TALK WEBRTC RADIO */}
+      <TacticalRadioHUD
+        userRole="AMBULANCE"
+        callsign={currentAmbulance?.ambulance_id || 'AMB-01'}
+      />
+
+      {/* CITIZEN SOS BOT & INCOMING DISTRESS FEED MODAL */}
+      <CitizenSOSModal
+        isOpen={showCitizenSOS}
+        onClose={() => setShowCitizenSOS(false)}
+        recentMessages={state?.recent_sos_messages}
+      />
     </div>
   );
 };

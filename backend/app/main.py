@@ -14,6 +14,7 @@ from backend.app.api.incidents import router as incident_router
 from backend.app.api.ambulance import router as amb_router
 from backend.app.api.resources import router as res_router
 from backend.app.api.gis import router as gis_router
+from backend.app.api.sos_broadcast import router as sos_router
 from backend.app.realtime.websocket_manager import ws_manager
 from simulation.engine import SimulationEngine
 
@@ -63,6 +64,7 @@ app.include_router(incident_router, prefix="/api")
 app.include_router(amb_router, prefix="/api")
 app.include_router(res_router, prefix="/api")
 app.include_router(gis_router, prefix="/api")
+app.include_router(sos_router, prefix="/api")
 
 @app.get("/api/health")
 def health_check():

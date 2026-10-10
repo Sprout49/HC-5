@@ -112,6 +112,37 @@ export interface Incident {
   is_unreachable?: boolean;
   unreachable_reason?: string;
   flood_risk_warning?: string;
+  source?: 'whatsapp' | 'telegram' | 'citizen_portal' | string;
+  sender_name?: string;
+  phone?: string;
+  caller_notes?: string;
+  media_url?: string;
+  reported_via?: string;
+}
+
+export interface SOSMessage {
+  id: string;
+  incident_id?: string;
+  source: 'whatsapp' | 'telegram' | 'citizen_portal' | string;
+  sender_name: string;
+  phone: string;
+  message: string;
+  location: [number, number];
+  trapped_count: number;
+  severity: SeverityLevel;
+  media_url?: string;
+  timestamp: number;
+}
+
+export interface EvacuationBroadcast {
+  id: string;
+  zone_name: string;
+  threat_level: 'Code red' | 'Moderate' | 'Safe' | 'CODE RED' | 'AMBER' | 'ALL CLEAR';
+  evacuation_order: string;
+  estimated_population: number;
+  channels: string[];
+  created_at: number;
+  is_active: boolean;
 }
 
 export interface MedicalCamp {
@@ -168,4 +199,6 @@ export interface SimulationState {
   medical_camps: MedicalCamp[];
   recommendations: Recommendation[];
   events: SimEvent[];
+  recent_sos_messages?: SOSMessage[];
+  active_evacuations?: EvacuationBroadcast[];
 }

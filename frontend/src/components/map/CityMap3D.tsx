@@ -616,8 +616,13 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
                       isCritical ? 'bg-red-600' :
                       inc.severity === 'HIGH' ? 'bg-orange-500' : 'bg-amber-500';
 
-      const icon = isSubmerged ? '🚤' : isPredicted ? '⚠️' : isTrappedAmb ? '🆘' : '⚠️';
-      const badgeText = isSubmerged ? `${inc.incident_id} • SUBMERGED (BOAT RESCUE)` :
+      const icon = inc.source === 'whatsapp' ? '📱' :
+                   inc.source === 'telegram' ? '✈️' :
+                   inc.source === 'citizen_portal' ? '🌐' :
+                   isSubmerged ? '🚤' : isPredicted ? '⚠️' : isTrappedAmb ? '🆘' : '⚠️';
+
+      const badgeText = inc.source ? `${inc.incident_id} • ${inc.source.toUpperCase()} SOS` :
+                        isSubmerged ? `${inc.incident_id} • SUBMERGED (BOAT RESCUE)` :
                         isPredicted ? `${inc.incident_id} • FLOOD CUTOFF RISK` :
                         isTrappedAmb ? `${inc.incident_id} • AMB TRAPPED` :
                         inc.incident_id;
@@ -627,13 +632,24 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
       const incidentInnerHtml = `
         <div class="relative flex flex-col items-center group">
           <!-- Rich Hover Tooltip -->
-          <div class="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-950/95 text-white p-2.5 rounded-xl shadow-2xl border border-slate-700/80 text-xs w-60 pointer-events-none z-50 backdrop-blur-md">
+          <div class="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-950/95 text-white p-2.5 rounded-xl shadow-2xl border border-slate-700/80 text-xs w-64 pointer-events-none z-50 backdrop-blur-md">
             <div class="flex items-center justify-between font-bold border-b border-slate-800 pb-1.5 mb-1.5">
               <span class="text-red-400 font-extrabold">${inc.incident_id}</span>
               <span class="text-[9px] px-1.5 py-0.5 rounded font-black ${isSubmerged ? 'bg-purple-600 text-white' : 'bg-red-900 text-red-200'}">
                 ${inc.status.replace(/_/g, ' ')}
               </span>
             </div>
+
+            ${inc.source ? `
+            <div class="p-1.5 bg-emerald-950/80 border border-emerald-500/60 rounded-lg text-emerald-200 text-[10px] space-y-0.5 mb-1.5">
+              <div class="flex justify-between items-center font-bold">
+                <span>${inc.source === 'whatsapp' ? '📱 WhatsApp SOS' : inc.source === 'telegram' ? '✈️ Telegram SOS' : '🌐 Citizen Portal'}</span>
+                <span class="text-white">${inc.sender_name || 'Citizen'}</span>
+              </div>
+              ${inc.phone ? `<div class="text-[9px] text-emerald-300 font-mono">📞 ${inc.phone}</div>` : ''}
+              ${inc.caller_notes ? `<div class="italic text-[9px] text-slate-200 border-t border-emerald-800/60 pt-0.5 mt-0.5">"${inc.caller_notes}"</div>` : ''}
+            </div>` : ''}
+
             <div class="space-y-1 text-[11px] text-slate-300">
               ${inc.unreachable_reason ? `
               <div class="p-1.5 bg-red-950/80 border border-red-500/60 rounded-lg text-red-200 font-semibold text-[10px] leading-tight">

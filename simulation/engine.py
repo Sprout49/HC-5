@@ -43,6 +43,8 @@ class SimulationEngine:
         self.medical_camps: List[Dict[str, Any]] = []
         self.recommendations: List[Dict[str, Any]] = []
         self.events: List[Dict[str, Any]] = []
+        self.recent_sos_messages: List[Dict[str, Any]] = []
+        self.active_evacuations: List[Dict[str, Any]] = []
 
         self.last_real_time = time.time()
         self.load_initial_state()
@@ -166,6 +168,8 @@ class SimulationEngine:
         self.save_fleet_registry()
 
         self.incidents = []
+        self.recent_sos_messages = []
+        self.active_evacuations = []
         self.medical_camps = []
         self.recommendations = []
         self.events = [
@@ -1133,5 +1137,7 @@ class SimulationEngine:
             "incidents": self.incidents,
             "medical_camps": self.medical_camps,
             "recommendations": self.recommendations,
+            "recent_sos_messages": getattr(self, "recent_sos_messages", []),
+            "active_evacuations": getattr(self, "active_evacuations", []),
             "events": self.events[:25]
         }
