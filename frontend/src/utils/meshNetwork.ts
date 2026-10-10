@@ -94,13 +94,34 @@ class MeshNetworkEngine {
       };
     } catch {}
 
-    // Load buffered packets from storage
+    // Load buffered packets and blackout state from storage
     try {
       const saved = localStorage.getItem('hc05_mesh_packet_buffer');
       if (saved) {
         this.packetBuffer = JSON.parse(saved);
       }
+      this.isSimulatedBlackout = localStorage.getItem('hc05_mesh_blackout') === 'true';
     } catch {}
+
+    // Synchronize cross-tab storage events
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'hc05_mesh_blackout') {
+          const nextVal = e.newValue === 'true';
+          if (this.isSimulatedBlackout !== nextVal) {
+            this.isSimulatedBlackout = nextVal;
+            this.notifyListeners();
+          }
+        } else if (e.key === 'hc05_mesh_packet_buffer') {
+          try {
+            if (e.newValue) {
+              this.packetBuffer = JSON.parse(e.newValue);
+              this.notifyListeners();
+            }
+          } catch {}
+        }
+      });
+    }
 
     // Heartbeat loop: broadcast presence every 1.2s to other open tabs
     setInterval(() => {
@@ -131,15 +152,37 @@ class MeshNetworkEngine {
         role: this.localTabInfo.role,
         name: this.localTabInfo.name,
         protocol: this.localTabInfo.protocol,
+        isBlackout: this.isSimulatedBlackout,
         timestamp: Date.now(),
       });
     }
   }
 
   private handleDiscoveryMessage(data: any) {
-    if (!data || data.nodeId === this.nodeId) return;
+    if (!data) return;
+
+    if (data.type === 'BLACKOUT_CHANGE') {
+      const nextVal = !!data.isBlackout;
+      if (this.isSimulatedBlackout !== nextVal) {
+        this.isSimulatedBlackout = nextVal;
+        try {
+          localStorage.setItem('hc05_mesh_blackout', String(nextVal));
+        } catch {}
+        this.notifyListeners();
+      }
+      return;
+    }
+
+    if (data.nodeId === this.nodeId) return;
 
     if (data.type === 'HEARTBEAT') {
+      if (data.isBlackout !== undefined && this.isSimulatedBlackout !== data.isBlackout) {
+        this.isSimulatedBlackout = !!data.isBlackout;
+        try {
+          localStorage.setItem('hc05_mesh_blackout', String(this.isSimulatedBlackout));
+        } catch {}
+      }
+
       this.liveTabPeers.set(data.nodeId, {
         id: data.nodeId,
         name: data.name,
@@ -208,6 +251,16 @@ class MeshNetworkEngine {
 
   public setSimulatedBlackout(val: boolean) {
     this.isSimulatedBlackout = val;
+    try {
+      localStorage.setItem('hc05_mesh_blackout', String(val));
+    } catch {}
+    if (this.discoveryChannel) {
+      this.discoveryChannel.postMessage({
+        type: 'BLACKOUT_CHANGE',
+        isBlackout: val,
+        nodeId: this.nodeId,
+      });
+    }
     this.notifyListeners();
   }
 

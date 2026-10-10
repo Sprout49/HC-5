@@ -19,7 +19,8 @@ incoming_sos_messages: List[Dict[str, Any]] = []
 
 class SOSWebhookRequest(BaseModel):
     source: str = Field("whatsapp", description="whatsapp, telegram, or citizen_portal")
-    sender_name: str = Field("Anonymous Citizen", description="Sender display name")
+    sender_name: Optional[str] = Field(None, description="Sender display name")
+    caller_name: Optional[str] = Field(None, description="Alternative sender display name")
     phone: str = Field("+91 98000 00000", description="Contact phone number")
     message: str = Field(..., description="Distress message details")
     lon: float = Field(73.8567, description="Longitude")
@@ -58,7 +59,10 @@ async def ingest_sos_webhook(req: SOSWebhookRequest):
     # Enrich incident with SOS webhook metadata
     channel_badge = "📱 WhatsApp SOS" if req.source == "whatsapp" else ("✈️ Telegram SOS" if req.source == "telegram" else "🌐 Citizen Portal")
     inc["source"] = req.source
-    inc["sender_name"] = req.sender_name
+    effective_name = req.caller_name or req.sender_name or "Anonymous Citizen"
+    inc["source"] = req.source
+    inc["sender_name"] = effective_name
+    inc["caller_name"] = effective_name
     inc["phone"] = req.phone
     inc["caller_notes"] = req.message
     inc["media_url"] = req.media_url
@@ -70,7 +74,7 @@ async def ingest_sos_webhook(req: SOSWebhookRequest):
         "id": f"SOS-{len(incoming_sos_messages)+1:03d}",
         "incident_id": inc.get("incident_id"),
         "source": req.source,
-        "sender_name": req.sender_name,
+        "sender_name": effective_name, "caller_name": effective_name,
         "phone": req.phone,
         "message": req.message,
         "location": [req.lon, req.lat],
@@ -85,7 +89,7 @@ async def ingest_sos_webhook(req: SOSWebhookRequest):
 
     # Log critical event
     engine.log_event(
-        f"🚨 INCOMING {channel_badge.upper()} [{req.sender_name}]: \"{req.message}\" ({req.trapped_count} trapped, [{req.lat:.4f}, {req.lon:.4f}]). Incident {inc.get('incident_id')} created.",
+        f"🚨 INCOMING {channel_badge.upper()} [{effective_name}]: \"{req.message}\" ({req.trapped_count} trapped, [{req.lat:.4f}, {req.lon:.4f}]). Incident {inc.get('incident_id')} created.",
         "critical" if req.severity in ["HIGH", "CRITICAL"] else "alert"
     )
 

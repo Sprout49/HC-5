@@ -10,6 +10,8 @@ import {
   Shield,
   Clock,
   RotateCcw,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
 import { API_BASE } from '../context/SimulationContext';
 import { meshNetwork } from '../utils/meshNetwork';
@@ -28,6 +30,16 @@ export const CitizenSOSPage: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [transmissionSeconds, setTransmissionSeconds] = useState(0);
   const [batteryLevel, setBatteryLevel] = useState<number>(84);
+  const [isBlackout, setIsBlackout] = useState(meshNetwork.isBlackoutActive());
+
+  // Register as Citizen Phone PWA on the Way 2 Mesh & sync blackout status
+  useEffect(() => {
+    meshNetwork.registerLocalTab('CITIZEN_PWA', 'Citizen Phone (PWA)', 'BLE 5.0 Beacon');
+    const unsub = meshNetwork.subscribe(() => {
+      setIsBlackout(meshNetwork.isBlackoutActive());
+    });
+    return () => unsub();
+  }, []);
 
   // Read hardware battery level if supported
   useEffect(() => {
@@ -85,6 +97,7 @@ export const CitizenSOSPage: React.FC = () => {
     const payload = {
       source: 'citizen_pwa_way2',
       caller_name: name || 'Stranded Resident',
+      sender_name: name || 'Stranded Resident',
       phone: phone || '+91 98230 00000',
       message: `CITIZEN RESCUE REQUEST: ${trappedCount} people trapped in ${waterLevel} floodwater at ${locationName}. [Medical: ${medicalNeeds.join(', ') || 'None'}] ${notes ? `(${notes})` : ''}`,
       lon: coords[0],
@@ -149,6 +162,34 @@ export const CitizenSOSPage: React.FC = () => {
           </span>
         </div>
       </header>
+
+      {/* 1b. MESH / CELL TOWER STATUS BAR */}
+      <div className={`px-4 py-2 border-b flex items-center justify-between text-xs transition-colors shrink-0 ${
+        isBlackout
+          ? 'bg-amber-950/70 border-amber-800/50 text-amber-200'
+          : 'bg-emerald-950/60 border-emerald-800/40 text-emerald-300'
+      }`}>
+        <div className="flex items-center gap-2">
+          {isBlackout ? (
+            <WifiOff className="w-4 h-4 text-amber-400 animate-pulse shrink-0" />
+          ) : (
+            <Wifi className="w-4 h-4 text-emerald-400 shrink-0" />
+          )}
+          <span className="font-bold text-[11px]">
+            {isBlackout ? 'CELL TOWER BLACKOUT ACTIVE' : '4G/5G CELLULAR ACTIVE'}
+          </span>
+          <span className="text-[10px] text-slate-300 hidden sm:inline">
+            {isBlackout
+              ? '• Beacons buffered locally and whispered via Phone BLE Mesh'
+              : '• Direct cellular dispatch sent to Central Command HQ'}
+          </span>
+        </div>
+        <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded ${
+          isBlackout ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+        }`}>
+          {isBlackout ? 'P2P BLE STORE & FORWARD' : 'DIRECT DISPATCH'}
+        </span>
+      </div>
 
       {/* 2. BODY CONTAINER */}
       <main className="flex-1 max-w-lg w-full mx-auto p-4 flex flex-col justify-center">
