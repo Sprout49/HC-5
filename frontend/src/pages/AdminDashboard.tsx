@@ -667,6 +667,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
                   .map((inc) => {
                     const isSubmerged = inc.status === 'UNREACHABLE_FLOODED';
                     const isPredicted = inc.status === 'PREDICTED_FLOOD_SUBMERGENCE';
+                    const isTrapped = inc.status === 'AMBULANCE_TRAPPED';
                     const badgeClass = isSubmerged ? 'bg-purple-100 text-purple-800 border-purple-200' :
                                        isPredicted ? 'bg-rose-100 text-rose-800 border-rose-200' :
                                        isTrapped ? 'bg-red-100 text-red-800 border-red-300 animate-pulse' :
