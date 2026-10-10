@@ -75,7 +75,7 @@ export const MeshRelayHUD: React.FC<MeshRelayHUDProps> = () => {
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
         onClick={() => setIsOpen(true)}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs border cursor-pointer ${
+        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-xs border whitespace-nowrap cursor-pointer ${
           isBlackout
             ? 'bg-amber-500/10 text-amber-700 border-amber-300 ring-2 ring-amber-400/30 animate-pulse'
             : btStatus.connected

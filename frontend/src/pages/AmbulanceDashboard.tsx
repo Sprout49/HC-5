@@ -97,7 +97,7 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="h-16 px-6 bg-white/80 backdrop-blur-2xl border-b border-white flex items-center justify-between z-30 shadow-sm"
+        className="min-h-[66px] sm:min-h-[74px] px-3 sm:px-6 py-2 bg-white/90 backdrop-blur-2xl border-b border-slate-200/80 flex items-center justify-between z-30 shadow-xs gap-3 overflow-x-auto no-scrollbar"
       >
         <div className="flex items-center gap-3">
           <motion.div whileHover={{ scale: 1.05 }} className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-xl shadow-md">
@@ -130,7 +130,7 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
                 {currentAmbulance?.status.replace(/_/g, ' ') || 'ONLINE'}
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 font-medium">
+            <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium whitespace-nowrap hidden sm:block">
               Staging: Zone {currentAmbulance?.assigned_zone} • Speed: {currentAmbulance?.speed_kmh || 45} km/h • Load: <strong className="text-slate-800">👥 {currentAmbulance?.patients_onboard || 0} / 2 Patients</strong>
             </p>
           </div>
@@ -149,7 +149,7 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
             title={useRealGps ? 'Click to return to Simulated Pune Flood Grid' : 'Click to stream real device GPS hardware coordinates (Judge Demo)'}
           >
             <Radio className={`w-3.5 h-3.5 ${useRealGps ? 'text-white animate-ping' : 'text-slate-500'}`} />
-            <span>{useRealGps ? '?? LIVE DEVICE GPS FEED' : '??? GPS: Pune Sim Grid'}</span>
+            <span>{useRealGps ? '📡 LIVE DEVICE GPS FEED' : '📍 GPS: Pune Sim Grid'}</span>
           </button>
 
           <MeshRelayHUD />
@@ -283,7 +283,7 @@ export const AmbulanceDashboard: React.FC<AmbulanceDashboardProps> = () => {
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
           className="absolute bottom-6 left-1/2 w-full max-w-xl px-4 z-20 pointer-events-none"
         >
-          <motion.div whileHover={{ y: -2 }} className="glass-panel p-6 rounded-[2rem] shadow-2xl border border-white/60 pointer-events-auto bg-white/70 backdrop-blur-2xl">
+          <motion.div whileHover={{ y: -2 }} className="glass-panel p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] shadow-2xl border border-white/60 pointer-events-auto bg-white/85 backdrop-blur-2xl max-h-[55vh] overflow-y-auto">
             {/* STATE 1: AVAILABLE / STANDBY */}
             {(!currentAmbulance || currentAmbulance.status === 'AVAILABLE' || currentAmbulance.status === 'COMPLETED') && (
               <div className="text-center py-3">

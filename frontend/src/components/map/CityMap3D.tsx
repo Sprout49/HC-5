@@ -14,6 +14,7 @@ interface CityMap3DProps {
   onSelectObject?: (type: 'road' | 'hospital' | 'ambulance' | 'zone' | 'incident' | 'camp', data: any) => void;
   focusAmbulanceId?: string | null;
   realGpsCoords?: [number, number] | null;
+  renderTopRightControls?: (helpers: { is3D: boolean; toggle2D3D: () => void; resetCamera: () => void }) => React.ReactNode;
 }
 
 export const CityMap3D: React.FC<CityMap3DProps> = ({
@@ -22,6 +23,7 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
   onSelectObject,
   focusAmbulanceId,
   realGpsCoords,
+  renderTopRightControls,
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -782,24 +784,30 @@ export const CityMap3D: React.FC<CityMap3DProps> = ({
       <div ref={mapContainer} className="w-full h-full" />
 
       {/* Camera Controls Overlay */}
-      <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
-        <button
-          onClick={toggle2D3D}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 shadow hover:bg-white transition-colors"
-          title="Toggle 2D / 3D Isometric View"
-        >
-          <Layers className="w-4 h-4 text-blue-600" />
-          <span>{is3D ? '3D Isometric' : '2D Top-Down'}</span>
-        </button>
+      <div className="absolute top-4 right-4 flex items-center gap-2 z-40 pointer-events-auto">
+        {renderTopRightControls ? (
+          renderTopRightControls({ is3D, toggle2D3D, resetCamera })
+        ) : (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggle2D3D}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 shadow hover:bg-white transition-colors cursor-pointer"
+              title="Toggle 2D / 3D Isometric View"
+            >
+              <Layers className="w-4 h-4 text-blue-600" />
+              <span>{is3D ? '3D Isometric' : '2D Top-Down'}</span>
+            </button>
 
-        <button
-          onClick={resetCamera}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 shadow hover:bg-white transition-colors"
-          title="Reset Camera View to Pune Center"
-        >
-          <Compass className="w-4 h-4 text-slate-600" />
-          <span>Reset Camera</span>
-        </button>
+            <button
+              onClick={resetCamera}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 shadow hover:bg-white transition-colors cursor-pointer"
+              title="Reset Camera View to Pune Center"
+            >
+              <Compass className="w-4 h-4 text-slate-600" />
+              <span>Reset Camera</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Creation Mode Banner if active */}

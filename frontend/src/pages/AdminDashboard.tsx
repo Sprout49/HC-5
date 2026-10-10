@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSimulation } from '../context/SimulationContext';
 import { CityMap3D } from '../components/map/CityMap3D';
 import { DetailDrawer } from '../components/admin/DetailDrawer';
@@ -6,8 +6,9 @@ import { FleetManagementModal } from '../components/admin/FleetManagementModal';
 import { useAuth } from '../context/AuthContext';
 import { CreateEmergencyModal } from '../components/admin/CreateEmergencyModal';
 import { AssumptionsModal } from '../components/admin/AssumptionsModal';
+import { TranetraLogo } from '../components/TranetraLogo';
 import type { SeverityLevel, SimEvent } from '../types/simulation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play,
   Pause,
@@ -27,6 +28,9 @@ import {
   MessageSquare,
   ShieldAlert,
   LifeBuoy,
+  Layers,
+  ChevronDown,
+  Compass,
 } from 'lucide-react';
 import { MeshRelayHUD } from '../components/emergency/MeshRelayHUD';
 import { TacticalRadioHUD } from '../components/emergency/TacticalRadioHUD';
@@ -55,9 +59,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
     deployMedicalCamp,
   } = useSimulation();
 
+  const [isLogoMenuOpen, setIsLogoMenuOpen] = useState(false);
   const [isCreateMode, setIsCreateMode] = useState(false);
   const [clickCoords, setClickCoords] = useState<[number, number] | null>(null);
   const [selectedObject, setSelectedObject] = useState<{ type: any; data: any } | null>(null);
+  const [showLeftMetrics, setShowLeftMetrics] = useState(true);
+  const [showRightStatus, setShowRightStatus] = useState(true);
+  const [showBottomStream, setShowBottomStream] = useState(true);
   const [showAssumptions, setShowAssumptions] = useState(false);
   const [showFleetModal, setShowFleetModal] = useState(false);
   const [showCitizenSOS, setShowCitizenSOS] = useState(false);
@@ -103,37 +111,198 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="h-16 px-4 bg-white/90 backdrop-blur-2xl border-b border-white flex items-center justify-between z-30 shadow-xs gap-2 shrink-0 overflow-x-auto no-scrollbar"
+        className="min-h-[66px] sm:min-h-[74px] py-2 px-3 sm:px-5 bg-white/95 backdrop-blur-2xl border-b border-slate-200/80 flex items-center justify-between z-40 shadow-xs gap-2 sm:gap-4 shrink-0 overflow-visible"
       >
-        {/* Left: Brand & Challenge */}
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-md">
-            HC
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="font-extrabold text-slate-900 text-sm tracking-tight">HC-05</h1>
-              <span className="text-[11px] font-bold px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200/60 rounded-full">
-                IFRC Flood Response
-              </span>
+        {/* Left: Brand Logo & Interactive Dropdown Menu */}
+        <div className="relative shrink-0">
+          <button
+            type="button"
+            onClick={() => setIsLogoMenuOpen(!isLogoMenuOpen)}
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-2xl hover:bg-sky-50/80 transition-all cursor-pointer border border-transparent hover:border-sky-200/80 group"
+            title="Click to open TRÃNETRA Command Menu"
+          >
+            <TranetraLogo size="sm" showText={false} className="shrink-0 group-hover:scale-105 transition-transform" />
+            <div className="flex flex-col text-left">
+              <div className="flex items-center gap-1.5">
+                <h1 className="font-black text-slate-900 text-sm sm:text-base tracking-tight leading-none">TRÃNETRA</h1>
+                <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 bg-sky-50 text-sky-700 border border-sky-200/80 rounded-full leading-normal">
+                  HC-05
+                </span>
+                <ChevronDown className={`w-3.5 h-3.5 text-sky-600 transition-transform duration-200 ${isLogoMenuOpen ? 'rotate-180' : ''}`} />
+              </div>
+              <p className="text-[10px] text-slate-500 font-medium whitespace-nowrap mt-0.5 leading-none hidden sm:block">
+                Emergency Command
+              </p>
             </div>
-            <p className="text-[11px] text-slate-500 font-medium">
-              Climate-Aware Emergency Response Network â€¢ Pune Grid
-            </p>
-          </div>
+          </button>
+
+          {/* Interactive Logo Flyout Menu */}
+          <AnimatePresence>
+            {isLogoMenuOpen && (
+              <>
+                {/* Backdrop overlay */}
+                <div className="fixed inset-0 z-40" onClick={() => setIsLogoMenuOpen(false)} />
+
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                  className="fixed top-[72px] left-4 z-50 w-80 sm:w-96 bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-sky-100/90 p-4 flex flex-col gap-3 max-h-[85vh] overflow-y-auto"
+                >
+                  {/* Brand Header */}
+                  <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
+                    <div className="flex items-center gap-2.5">
+                      <TranetraLogo size="sm" showText={false} />
+                      <div>
+                        <div className="font-black text-sm text-slate-900">TRÃNETRA Command Menu</div>
+                        <div className="text-[10px] text-slate-500 font-medium">Climate-Aware Emergency Network</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setIsLogoMenuOpen(false)}
+                      className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Reference Image Menu Items Section */}
+                  <div className="flex flex-col gap-2 pt-1">
+                    <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-1">
+                      Emergency Actions & Mesh
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <MeshRelayHUD />
+
+                      <button
+                        onClick={() => {
+                          setShowCitizenSOS(true);
+                          setIsLogoMenuOpen(false);
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
+                        title="Incoming WhatsApp & Telegram Citizen SOS Stream"
+                      >
+                        <MessageSquare className="w-4 h-4 text-emerald-600" />
+                        <span>SOS Bot</span>
+                        {(state?.recent_sos_messages?.length ?? 0) > 0 && (
+                          <span className="w-4 h-4 rounded-full bg-emerald-600 text-white text-[9px] font-black flex items-center justify-center">
+                            {state?.recent_sos_messages?.length}
+                          </span>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setShowEvacModal(true);
+                          setIsLogoMenuOpen(false);
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
+                        title="Dispatch Geo-Fenced Reverse-911 Evacuation Warning"
+                      >
+                        <ShieldAlert className="w-4 h-4 text-rose-600" />
+                        <span>Evacuation</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          window.open('/sos', '_blank');
+                          setIsLogoMenuOpen(false);
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-2 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
+                        title="Open Pre-Cached Citizen Offline SOS Portal (/sos) in New Window"
+                      >
+                        <LifeBuoy className="w-4 h-4 text-sky-600" />
+                        <span>Citizen SOS (/sos)</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setShowAssumptions(true);
+                          setIsLogoMenuOpen(false);
+                        }}
+                        className="p-2 text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer border border-slate-200/60"
+                        title="View Simulation Assumptions"
+                      >
+                        <HelpCircle className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Dispatcher Session & Portal Switcher */}
+                  <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+                    <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-1">
+                      Session & Portal Switcher
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2 bg-slate-50 p-2 rounded-xl border border-slate-100">
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg text-xs font-bold text-slate-700 border border-slate-200/80 shadow-2xs">
+                          <Shield className="w-3.5 h-3.5 text-blue-600" />
+                          <span>{adminUser?.name || 'Central Command Lead'}</span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            logoutAdmin();
+                            window.location.href = '/admin/login';
+                          }}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                          title="Sign Out of Admin Console"
+                        >
+                          <LogOut className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {onSwitchTab && (
+                        <div className="flex items-center bg-white p-0.5 rounded-lg border border-slate-200">
+                          <button
+                            onClick={() => {
+                              onSwitchTab('admin');
+                              setIsLogoMenuOpen(false);
+                            }}
+                            className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                              activeTab === 'admin'
+                                ? 'bg-blue-600 text-white shadow-xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            Admin
+                          </button>
+                          <button
+                            onClick={() => {
+                              onSwitchTab('ambulance');
+                              setIsLogoMenuOpen(false);
+                            }}
+                            className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                              activeTab === 'ambulance'
+                                ? 'bg-slate-900 text-white shadow-xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            Ambulance
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Center: Scenario & Timeline Status */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 shrink-0">
           {/* Scenario Selector */}
-          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200/60">
+          <div className="flex items-center gap-1 bg-slate-100/90 p-1 rounded-2xl border border-slate-200/70">
             {['NORMAL', 'MODERATE FLOOD', 'SEVERE FLOOD'].map((sc) => (
               <button
                 key={sc}
                 onClick={() => setScenario(sc)}
-                className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all whitespace-nowrap cursor-pointer ${
                   state?.scenario_name === sc
-                    ? 'bg-white text-blue-700 shadow-xs'
+                    ? 'bg-white text-blue-700 shadow-xs border border-slate-200/50'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -143,29 +312,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
           </div>
 
           {/* Time & Simulation Status */}
-          <div className="flex items-center gap-3 px-3.5 py-1.5 bg-slate-100/80 rounded-xl border border-slate-200/60">
-            <div className="text-right">
-              <span className="block text-[10px] uppercase font-bold text-slate-400">Time</span>
-              <span className="text-xs font-bold text-slate-800">
-                {state?.simulation_time_str || 'Day 1 â€¢ 14:00'}
+          <div className="flex items-center gap-3 px-3.5 py-1.5 bg-slate-100/90 rounded-2xl border border-slate-200/70">
+            <div className="flex flex-col">
+              <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider leading-none">Sim Clock</span>
+              <span className="text-xs font-bold font-mono text-slate-800 leading-tight mt-0.5 whitespace-nowrap">
+                {state?.simulation_time_str || 'Day 1 • 14:00'}
               </span>
             </div>
-            <span
-              className={`w-2.5 h-2.5 rounded-full ${
-                state?.is_running ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
-              }`}
-            />
-            <span className="text-xs font-bold text-slate-700">
-              {state?.is_running ? 'SIMULATING' : 'PAUSED'}
-            </span>
+            <div className="h-6 w-px bg-slate-200" />
+            <div className="flex items-center gap-1.5">
+              <span
+                className={`w-2.5 h-2.5 rounded-full ${
+                  state?.is_running ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
+                }`}
+              />
+              <span className="text-xs font-bold text-slate-700 whitespace-nowrap">
+                {state?.is_running ? 'SIMULATING' : 'PAUSED'}
+              </span>
+            </div>
           </div>
 
           {/* Playback Controls */}
-          <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-xs">
+          <div className="flex items-center gap-1 bg-white p-1 rounded-2xl border border-slate-200/90 shadow-xs">
             {state?.is_running ? (
               <button
                 onClick={pauseSimulation}
-                className="p-1.5 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
                 title="Pause Simulation"
               >
                 <Pause className="w-4 h-4" />
@@ -173,7 +345,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
             ) : (
               <button
                 onClick={startSimulation}
-                className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors cursor-pointer"
                 title="Start Simulation"
               >
                 <Play className="w-4 h-4 fill-emerald-600" />
@@ -182,7 +354,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
 
             <button
               onClick={stepSimulation}
-              className="p-1.5 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+              className="p-2 text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
               title="Step +10 Minutes Forward"
             >
               <FastForward className="w-4 h-4" />
@@ -190,21 +362,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
 
             <button
               onClick={resetSimulation}
-              className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
+              className="p-2 text-slate-500 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
               title="Reset Simulation"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
 
             {/* Speeds */}
-            <div className="flex items-center pl-1 border-l border-slate-200 gap-0.5">
+            <div className="flex items-center pl-1.5 border-l border-slate-200 gap-1">
               {[1, 2, 4].map((spd) => (
                 <button
                   key={spd}
                   onClick={() => setSpeed(spd)}
-                  className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${
+                  className={`px-2 py-1 text-[11px] font-bold rounded-lg transition-all cursor-pointer ${
                     state?.sim_speed === spd
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-blue-600 text-white shadow-xs'
                       : 'text-slate-500 hover:bg-slate-100'
                   }`}
                 >
@@ -216,126 +388,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
         </div>
 
         {/* Right: Actions, Demo Button, Assumptions, and Dashboard Switcher */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => setIsCreateMode(!isCreateMode)}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-bold text-xs transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-xs transition-all whitespace-nowrap cursor-pointer ${
               isCreateMode
                 ? 'bg-amber-500 text-white shadow-md ring-2 ring-amber-300'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/60'
             }`}
           >
-            <PlusCircle className="w-3.5 h-3.5" />
+            <PlusCircle className="w-4 h-4" />
             <span>{isCreateMode ? 'Click Map' : 'Report'}</span>
           </button>
 
           <button
             onClick={loadDemoScenario}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-xs transition-all"
+            className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-xs transition-all whitespace-nowrap cursor-pointer"
             title="Load Pre-Seeded Hackathon Demo Scenario"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <Sparkles className="w-4 h-4 text-amber-300" />
             <span>Demo</span>
           </button>
 
           <button
             onClick={() => setShowFleetModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-xl font-bold text-xs shadow-xs transition-all whitespace-nowrap cursor-pointer"
             title="Manage Fleet, Commission/Decommission Vehicles and View Driver Logins"
           >
-            <AmbulanceIcon className="w-3.5 h-3.5 text-indigo-600" />
+            <AmbulanceIcon className="w-4 h-4 text-indigo-600" />
             <span>Fleet ({state?.ambulances?.length || 0})</span>
           </button>
 
-          <div className="h-5 w-px bg-slate-200 mx-0.5" />
-
-          <MeshRelayHUD />
-
-          <button
-            onClick={() => setShowCitizenSOS(true)}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
-            title="Incoming WhatsApp & Telegram Citizen SOS Stream"
-          >
-            <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
-            <span>SOS Bot</span>
-            {(state?.recent_sos_messages?.length ?? 0) > 0 && (
-              <span className="w-4 h-4 rounded-full bg-emerald-600 text-white text-[9px] font-black flex items-center justify-center">
-                {state?.recent_sos_messages?.length}
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setShowEvacModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
-            title="Dispatch Geo-Fenced Reverse-911 Evacuation Warning"
-          >
-            <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-            <span>Evacuation</span>
-          </button>
-
-          <button
-            onClick={() => window.open('/sos', '_blank')}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200/80 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer"
-            title="Open Pre-Cached Citizen Offline SOS Portal (/sos) in New Window"
-          >
-            <LifeBuoy className="w-3.5 h-3.5 text-sky-600" />
-            <span>Citizen SOS (/sos)</span>
-          </button>
-
-          <button
-            onClick={() => setShowAssumptions(true)}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
-            title="View Simulation Assumptions"
-          >
-            <HelpCircle className="w-3.5 h-3.5" />
-          </button>
-
-          {/* Admin Profile & Logout */}
-          <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 rounded-lg text-xs font-bold text-slate-700">
-              <Shield className="w-3.5 h-3.5 text-blue-600" />
-              <span>{adminUser?.name || 'Lead Dispatcher'}</span>
-            </div>
-            <button
-              onClick={() => {
-                logoutAdmin();
-                window.location.href = '/admin/login';
-              }}
-              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-              title="Sign Out of Admin Console"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Integrated Portal Switcher Pill */}
-          {onSwitchTab && (
-            <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 ml-1">
-              <button
-                onClick={() => onSwitchTab('admin')}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === 'admin'
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Shield className="w-3 h-3" />
-                <span>Admin</span>
-              </button>
-              <button
-                onClick={() => onSwitchTab('ambulance')}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === 'ambulance'
-                    ? 'bg-slate-900 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <AmbulanceIcon className="w-3 h-3" />
-                <span>Ambulance</span>
-              </button>
-            </div>
-          )}
         </div>
       </motion.header>
 
@@ -348,12 +431,72 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
           isCreateMode={isCreateMode}
           onMapClickForEmergency={handleMapClickForEmergency}
           onSelectObject={(type, data) => setSelectedObject({ type, data })}
+          renderTopRightControls={({ is3D, toggle2D3D, resetCamera }) => (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowLeftMetrics(!showLeftMetrics)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 backdrop-blur-md rounded-lg border text-xs font-semibold shadow transition-all cursor-pointer ${
+                  showLeftMetrics
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-blue-500/20'
+                    : 'bg-white/90 hover:bg-white text-slate-700 border-slate-200'
+                }`}
+                title="Toggle Flood Hazard & Road Accessibility Metrics"
+              >
+                <Layers className="w-4 h-4 text-blue-600" />
+                <span>Metrics</span>
+              </button>
+
+              <button
+                onClick={() => setShowRightStatus(!showRightStatus)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 backdrop-blur-md rounded-lg border text-xs font-semibold shadow transition-all cursor-pointer ${
+                  showRightStatus
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-blue-500/20'
+                    : 'bg-white/90 hover:bg-white text-slate-700 border-slate-200'
+                }`}
+                title="Toggle Hospitals & Active Incident Triage"
+              >
+                <Activity className="w-4 h-4 text-emerald-600" />
+                <span>Triage</span>
+              </button>
+
+              <button
+                onClick={() => setShowBottomStream(!showBottomStream)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 backdrop-blur-md rounded-lg border text-xs font-semibold shadow transition-all cursor-pointer ${
+                  showBottomStream
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-blue-500/20'
+                    : 'bg-white/90 hover:bg-white text-slate-700 border-slate-200'
+                }`}
+                title="Toggle System Recommendations & Live Audit Stream"
+              >
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                <span>Ops Stream</span>
+              </button>
+
+              <button
+                onClick={toggle2D3D}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 shadow hover:bg-white transition-colors cursor-pointer"
+                title="Toggle 2D / 3D Isometric View"
+              >
+                <Layers className="w-4 h-4 text-blue-600" />
+                <span>{is3D ? '3D Isometric' : '2D Top-Down'}</span>
+              </button>
+
+              <button
+                onClick={resetCamera}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 shadow hover:bg-white transition-colors cursor-pointer"
+                title="Reset Camera View to Pune Center"
+              >
+                <Compass className="w-4 h-4 text-slate-600" />
+                <span>Reset Camera</span>
+              </button>
+            </div>
+          )}
         />
 
         {/* Floating Incident Creation Prompt Banner */}
         {isCreateMode && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 px-4 py-2 bg-amber-500 text-white rounded-full shadow-2xl animate-pulse border-2 border-white">
-            <span className="text-sm">ðŸŽ¯</span>
+            <span className="text-sm">🎯</span>
             <span className="text-xs font-bold tracking-wide">CLICK ANYWHERE ON THE MAP TO REPORT EMERGENCY</span>
             <button
               onClick={() => setIsCreateMode(false)}
@@ -365,12 +508,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
         )}
 
         {/* FLOATING LEFT METRICS PANEL */}
-        <motion.div 
-          initial={{ x: -100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-          className="absolute top-20 left-4 flex flex-col gap-4 z-20 pointer-events-none max-h-[calc(100vh-140px)] overflow-y-auto no-scrollbar pb-8 hidden md:flex"
-        >
+        <AnimatePresence>
+        {showLeftMetrics && (
+          <motion.div 
+            initial={{ x: -100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -100, opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="absolute top-16 sm:top-20 left-4 flex flex-col gap-3 sm:gap-4 z-20 pointer-events-none max-h-[calc(100vh-150px)] overflow-y-auto no-scrollbar pb-8 max-w-[90vw] sm:max-w-xs"
+          >
           {/* Flood Status Card */}
           <motion.div whileHover={{ scale: 1.02 }} className="w-80 glass-panel p-5 pointer-events-auto">
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
@@ -378,7 +524,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
                 Flood Hazard Status
               </span>
               <span className="text-xs font-bold text-blue-600 flex items-center gap-1">
-                <span>ðŸŒŠ</span>
+                <span>🌊</span>
                 <span>+{state?.water_rise_m.toFixed(2) || '0.00'}m</span>
               </span>
             </div>
@@ -450,14 +596,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
             </p>
           </motion.div>
         </motion.div>
+        )}
+        </AnimatePresence>
 
         {/* FLOATING RIGHT STATUS PANEL */}
-        <motion.div 
-          initial={{ x: 100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-          className="absolute top-20 right-4 lg:right-6 flex flex-col gap-4 z-20 pointer-events-none max-h-[calc(100vh-140px)] overflow-y-auto no-scrollbar pb-8 hidden lg:flex"
-        >
+        <AnimatePresence>
+        {showRightStatus && (
+          <motion.div 
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 100, opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="absolute top-16 sm:top-20 right-4 lg:right-6 flex flex-col gap-3 sm:gap-4 z-20 pointer-events-none max-h-[calc(100vh-150px)] overflow-y-auto no-scrollbar pb-8 max-w-[90vw] sm:max-w-sm"
+          >
           {/* Hospital Fleet Capacity */}
           <motion.div whileHover={{ scale: 1.02 }} className="w-80 lg:w-96 glass-panel p-5 pointer-events-auto">
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
@@ -516,14 +667,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
                   .map((inc) => {
                     const isSubmerged = inc.status === 'UNREACHABLE_FLOODED';
                     const isPredicted = inc.status === 'PREDICTED_FLOOD_SUBMERGENCE';
-                    const isTrapped = inc.status === 'AMBULANCE_TRAPPED';
                     const badgeClass = isSubmerged ? 'bg-purple-100 text-purple-800 border-purple-200' :
                                        isPredicted ? 'bg-rose-100 text-rose-800 border-rose-200' :
                                        isTrapped ? 'bg-red-100 text-red-800 border-red-300 animate-pulse' :
                                        'bg-white text-slate-700 border-slate-200';
-                    const badgeText = isSubmerged ? 'ðŸš¤ SUBMERGED (BOAT EVAC)' :
-                                      isPredicted ? 'âš ï¸ FLOOD CUTOFF' :
-                                      isTrapped ? 'ðŸ†˜ AMB TRAPPED' :
+                    const badgeText = isSubmerged ? '🚤 SUBMERGED (BOAT EVAC)' :
+                                      isPredicted ? '⚠️ FLOOD CUTOFF' :
+                                      isTrapped ? '🆘 AMB TRAPPED' :
                                       (inc.assigned_ambulance_id || 'DISPATCHING');
                     return (
                       <div
@@ -551,14 +701,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
             </div>
           </motion.div>
         </motion.div>
+        )}
+        </AnimatePresence>
 
         {/* BOTTOM FLOATING SYSTEM ACTIONS & EVENT STREAM */}
-        <motion.div 
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-          className="absolute bottom-4 left-4 right-4 z-20 flex flex-col lg:flex-row gap-4 pointer-events-none"
-        >
+        <AnimatePresence>
+        {showBottomStream && (
+          <motion.div 
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="absolute bottom-4 left-4 right-4 z-20 flex flex-col lg:flex-row gap-3 pointer-events-none max-h-[45vh] lg:max-h-[30vh] overflow-y-auto no-scrollbar"
+          >
           {/* Action Recommendations Card */}
           <motion.div whileHover={{ y: -2 }} className="flex-1 glass-panel p-5 pointer-events-auto shadow-2xl">
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
@@ -591,9 +746,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
                     </div>
                     <button
                       onClick={() => deployMedicalCamp(rec.zone_id)}
-                      className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow hover:shadow-md transition-all whitespace-nowrap"
+                      className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow hover:shadow-md transition-all whitespace-nowrap flex items-center gap-1.5"
                     >
-                      ðŸ•ï¸ {rec.action_label}
+                      <Tent className="w-4 h-4" />
+                      <span>{rec.action_label}</span>
                     </button>
                   </div>
                 ))}
@@ -602,7 +758,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
               <div className="flex items-center justify-between text-xs text-slate-500 py-1">
                 <span>All zone healthcare corridors and emergency dispatches currently optimal.</span>
                 <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
-                  <span>âœ“</span> No active gaps
+                  <span>✓</span> No active gaps
                 </span>
               </div>
             )}
@@ -641,6 +797,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeTab = 'adm
             </div>
           </motion.div>
         </motion.div>
+        )}
+        </AnimatePresence>
       </main>
 
       {/* 3. MODALS & DRAWERS */}
